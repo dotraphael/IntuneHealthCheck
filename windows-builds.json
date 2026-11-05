@@ -1,1 +1,116 @@
+[
+  {
+    "build": "26300",
+    "name": "Windows 11 26H2",
+    "released": "2026-09-29",
+    "endOfService": "2029-10-09"
+  },
+  {
+    "build": "28000",
+    "name": "Windows 11 26H1",
+    "released": "2026-02-10",
+    "endOfService": "2029-03-13"
+  },
 
+  {
+    "build": "26200",
+    "name": "Windows 11 25H2",
+    "released": "2025-09-30",
+    "endOfService": "2028-10-10"
+  },
+  {
+    "build": "26100",
+    "name": "Windows 11 24H2",
+    "released": "2024-10-01",
+    "endOfService": "2027-10-12"
+  },
+  {
+    "build": "22631",
+    "name": "Windows 11 23H2",
+    "released": "2023-10-31",
+    "endOfService": "2026-11-10"
+  },
+  {
+    "build": "22621",
+    "name": "Windows 11 22H2",
+    "released": "2022-09-20",
+    "endOfService": "2025-10-14"
+  },
+  {
+    "build": "22000",
+    "name": "Windows 11 21H2",
+    "released": "2021-10-04",
+    "endOfService": "2024-10-08"
+  },
+  {
+    "build": "19045",
+    "name": "Windows 10 22H2",
+    "released": "2022-10-18",
+    "endOfService": "2025-10-14"
+  },
+  {
+    "build": "19044",
+    "name": "Windows 10 21H2",
+    "released": "2021-11-16",
+    "endOfService": "2024-06-11"
+  },
+  {
+    "build": "19043",
+    "name": "Windows 10 21H1",
+    "released": "2021-05-18",
+    "endOfService": "2022-12-13"
+  },
+  {
+    "build": "19042",
+    "name": "Windows 10 20H2",
+    "released": "2020-10-20",
+    "endOfService": "2023-05-09"
+  },
+  {
+    "build": "19041",
+    "name": "Windows 10 2004",
+    "released": "2020-05-27",
+    "endOfService": "2021-12-14"
+  },
+  {
+    "build": "18363",
+    "name": "Windows 10 1909",
+    "released": "2019-11-12",
+    "endOfService": "2022-05-10"
+  },
+  {
+    "build": "18362",
+    "name": "Windows 10 1903",
+    "endOfService": "2020-12-08"
+  },
+  {
+    "build": "17763",
+    "name": "Windows 10 1809",
+    "endOfService": "2021-05-11"
+  },
+  {
+    "build": "17134",
+    "name": "Windows 10 1803",
+    "endOfService": "2021-05-11"
+  },
+  {
+    "build": "16299",
+    "name": "Windows 10 1709",
+    "endOfService": "2020-10-13"
+  },
+  {
+    "build": "15063",
+    "name": "Windows 10 1703",
+    "endOfService": "2019-10-08"
+  },
+  {
+    "build": "14393",
+    "name": "Windows 10 1607",
+    "endOfService": "2019-04-09"
+  },
+  {
+    "build": "10240",
+    "name": "Windows 10 1507",
+    "endOfService": "2017-05-09"
+  }
+]

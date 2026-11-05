@@ -1,0 +1,22 @@
+[
+  {
+    "level": "notConfigured",
+    "name": "Not configured",
+    "weak": true
+  },
+  {
+    "level": "high",
+    "name": "High",
+    "weak": false
+  },
+  {
+    "level": "highPlus",
+    "name": "High plus",
+    "weak": false
+  },
+  {
+    "level": "zeroTolerance",
+    "name": "Zero tolerance",
+    "weak": false
+  }
+]

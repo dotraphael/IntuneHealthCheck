@@ -1,0 +1,97 @@
+[
+  {
+    "name": "secrets",
+    "description": "Password assignment",
+    "pattern": "(?i)\\$?(password|passwd|pwd)\\s*[:=]\\s*[\"'][^\"']{6,}[\"']"
+  },
+  {
+    "name": "secrets",
+    "description": "Client secret",
+    "pattern": "(?i)(client_?secret|clientsecret)\\s*[:=]\\s*[\"'][^\"']{16,}[\"']"
+  },
+  {
+    "name": "secrets",
+    "description": "Connection string with credentials",
+    "pattern": "(?i)(password|pwd)=[^;\\s]{6,}"
+  },
+  {
+    "name": "secrets",
+    "description": "Bearer token",
+    "pattern": "(?i)bearer\\s+[A-Za-z0-9\\-_\\.]{40,}"
+  },
+  {
+    "name": "secrets",
+    "description": "Private key block",
+    "pattern": "-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----"
+  },
+  {
+    "name": "secrets",
+    "description": "Base64 credential blob",
+    "pattern": "(?i)(secret|token|apikey|api_key)\\s*[:=]\\s*[\"'][A-Za-z0-9+/=]{32,}[\"']"
+  },
+  {
+    "name": "insecureDownload",
+    "description": "Plain HTTP download",
+    "pattern": "(?i)(invoke-webrequest|invoke-restmethod|start-bitstransfer|curl|wget)[^\\n]*http://"
+  },
+  {
+    "name": "insecureDownload",
+    "description": "Download and execute in one step",
+    "pattern": "(?i)(invoke-webrequest|invoke-restmethod|downloadstring)[^\\n]*\\|\\s*(iex|invoke-expression)"
+  },
+  {
+    "name": "insecureDownload",
+    "description": "Certificate validation disabled",
+    "pattern": "(?i)(servercertificatevalidationcallback|skipcertificatecheck)"
+  },
+  {
+    "name": "packager",
+    "description": "Patch My PC",
+    "pattern": "(?i)patch\\s*my\\s*pc"
+  },
+  {
+    "name": "packager",
+    "description": "Scappman",
+    "pattern": "(?i)\\bscappman\\b"
+  },
+  {
+    "name": "packager",
+    "description": "Robopack",
+    "pattern": "(?i)\\brobopack\\b"
+  },
+  {
+    "name": "packager",
+    "description": "PDQ Connect or Deploy",
+    "pattern": "(?i)\\bpdq\\s*(connect|deploy)\\b"
+  },
+  {
+    "name": "packager",
+    "description": "Chocolatey",
+    "pattern": "(?i)\\bchocolatey\\b"
+  },
+  {
+    "name": "packager",
+    "description": "Ninite",
+    "pattern": "(?i)\\bninite\\b"
+  },
+  {
+    "name": "packager",
+    "description": "Winget or the Windows Package Manager",
+    "pattern": "(?i)\\b(winget|windows package manager)\\b"
+  },
+  {
+    "name": "packager",
+    "description": "Liquit",
+    "pattern": "(?i)\\bliquit\\b"
+  },
+  {
+    "name": "packager",
+    "description": "Recast Application Manager",
+    "pattern": "(?i)\\brecast\\b.*\\bapplication manager\\b"
+  },
+  {
+    "name": "packager",
+    "description": "Rimo3",
+    "pattern": "(?i)\\brimo3\\b"
+  }
+]

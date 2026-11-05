@@ -1,0 +1,23 @@
+[
+  {
+    "id": "CE",
+    "name": "Cyber Essentials",
+    "publisher": "NCSC",
+    "version": "current",
+    "controls": [
+      "CE:firewalls",
+      "CE:secure-configuration",
+      "CE:user-access-control",
+      "CE:malware-protection",
+      "CE:security-update-management",
+      "CE:patch-within-14-days"
+    ]
+  },
+  {
+    "id": "CIS-INTUNE",
+    "name": "CIS Microsoft Intune for Windows Benchmark",
+    "publisher": "CIS",
+    "version": "to be recorded",
+    "controls": []
+  }
+]

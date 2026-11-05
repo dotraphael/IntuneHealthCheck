@@ -1,0 +1,4 @@
+[
+  { "method": "aesCbc128", "weak": true },
+  { "method": "xtsAes128", "weak": true }
+]

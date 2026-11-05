@@ -1,0 +1,6 @@
+[
+  { "channel": "SemiAnnual", "slow": true },
+  { "channel": "SemiAnnualPreview", "slow": true },
+  { "channel": "PerpetualVL2019", "slow": true },
+  { "channel": "PerpetualVL2021", "slow": true }
+]

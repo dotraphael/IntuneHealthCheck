@@ -1,0 +1,97 @@
+[
+  {
+    "id": "blockabuseofexploitedvulnerablesigneddrivers",
+    "name": "Block abuse of exploited vulnerable signed drivers",
+    "recommended": true
+  },
+  {
+    "id": "blockadobereaderfromcreatingchildprocesses",
+    "name": "Block Adobe Reader from creating child processes",
+    "recommended": false
+  },
+  {
+    "id": "blockallofficeapplicationsfromcreatingchildprocesses",
+    "name": "Block all Office applications from creating child processes",
+    "recommended": false
+  },
+  {
+    "id": "blockcredentialstealingfromwindowslocalsecurityauthoritysubsystem",
+    "name": "Block credential stealing from the Windows local security authority subsystem",
+    "recommended": true
+  },
+  {
+    "id": "blockexecutablecontentfromemailclientandwebmail",
+    "name": "Block executable content from email client and webmail",
+    "recommended": false
+  },
+  {
+    "id": "blockexecutablefilesrunningunlesstheymeetprevalenceagetrustedlistcriterion",
+    "name": "Block executable files running unless they meet a prevalence, age or trusted list criterion",
+    "recommended": false
+  },
+  {
+    "id": "blockexecutionofpotentiallyobfuscatedscripts",
+    "name": "Block execution of potentially obfuscated scripts",
+    "recommended": false
+  },
+  {
+    "id": "blockjavascriptorvbscriptfromlaunchingdownloadedexecutablecontent",
+    "name": "Block JavaScript or VBScript from launching downloaded executable content",
+    "recommended": false
+  },
+  {
+    "id": "blockofficeapplicationsfromcreatingexecutablecontent",
+    "name": "Block Office applications from creating executable content",
+    "recommended": false
+  },
+  {
+    "id": "blockofficeapplicationsfrominjectingcodeintootherprocesses",
+    "name": "Block Office applications from injecting code into other processes",
+    "recommended": false
+  },
+  {
+    "id": "blockofficecommunicationappfromcreatingchildprocesses",
+    "name": "Block Office communication application from creating child processes",
+    "recommended": false
+  },
+  {
+    "id": "blockpersistencethroughwmieventsubscription",
+    "name": "Block persistence through WMI event subscription",
+    "recommended": true
+  },
+  {
+    "id": "blockprocesscreationsfrompsexecandwmicommands",
+    "name": "Block process creations originating from PsExec and WMI commands",
+    "recommended": false
+  },
+  {
+    "id": "blockrebootingmachineinsafemode",
+    "name": "Block rebooting the machine in Safe Mode",
+    "recommended": false
+  },
+  {
+    "id": "blockuntrustedunsignedprocessesthatrunfromusb",
+    "name": "Block untrusted and unsigned processes that run from USB",
+    "recommended": false
+  },
+  {
+    "id": "blockuseofcopiedorimpersonatedsystemtools",
+    "name": "Block use of copied or impersonated system tools",
+    "recommended": false
+  },
+  {
+    "id": "blockwebshellcreationforservers",
+    "name": "Block webshell creation for servers",
+    "recommended": false
+  },
+  {
+    "id": "blockwin32apicallsfromofficemacros",
+    "name": "Block Win32 API calls from Office macros",
+    "recommended": false
+  },
+  {
+    "id": "useadvancedprotectionagainstransomware",
+    "name": "Use advanced protection against ransomware",
+    "recommended": false
+  }
+]

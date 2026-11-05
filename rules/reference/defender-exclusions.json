@@ -1,0 +1,17 @@
+[
+  {
+    "pattern": "^[A-Za-z]:\\\\$"
+  },
+  {
+    "pattern": "^[A-Za-z]:\\\\Users\\\\?\\*?$"
+  },
+  {
+    "pattern": "^\\*$"
+  },
+  {
+    "pattern": "(?i)^[A-Za-z]:\\\\Windows\\\\?\\*?$"
+  },
+  {
+    "pattern": "(?i)^[A-Za-z]:\\\\Program Files\\\\?\\*?$"
+  }
+]

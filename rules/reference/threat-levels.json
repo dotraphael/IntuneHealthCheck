@@ -1,0 +1,22 @@
+[
+  {
+    "level": "secured",
+    "rank": 1,
+    "name": "Clear"
+  },
+  {
+    "level": "low",
+    "rank": 2,
+    "name": "Low"
+  },
+  {
+    "level": "medium",
+    "rank": 3,
+    "name": "Medium"
+  },
+  {
+    "level": "high",
+    "rank": 4,
+    "name": "High"
+  }
+]

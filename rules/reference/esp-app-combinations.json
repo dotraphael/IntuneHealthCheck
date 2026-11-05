@@ -1,0 +1,4 @@
+[
+  { "combination": ["Win32", "WindowsMobileMSI"], "risky": true },
+  { "combination": ["Win32", "WinGetApp"], "risky": true }
+]

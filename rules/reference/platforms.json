@@ -1,0 +1,6 @@
+[
+  { "platform": "windows81", "retired": true },
+  { "platform": "windowsPhone81", "retired": true },
+  { "platform": "windows10Team", "retired": true },
+  { "platform": "androidDeviceAdministrator", "retired": true }
+]

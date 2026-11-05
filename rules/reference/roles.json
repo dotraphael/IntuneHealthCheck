@@ -1,0 +1,21 @@
+[
+  { "name": "Global Administrator", "privileged": true },
+  { "name": "Privileged Role Administrator", "privileged": true },
+  { "name": "Privileged Authentication Administrator", "privileged": true },
+  { "name": "Authentication Administrator", "privileged": true },
+  { "name": "Billing Administrator", "privileged": true },
+  { "name": "Password Administrator", "privileged": true },
+  { "name": "Security Administrator", "privileged": true },
+  { "name": "Intune Administrator", "privileged": true },
+  { "name": "Exchange Administrator", "privileged": true },
+  { "name": "SharePoint Administrator", "privileged": true },
+  { "name": "User Administrator", "privileged": true },
+  { "name": "Application Administrator", "privileged": true },
+  { "name": "Cloud Application Administrator", "privileged": true },
+  { "name": "Conditional Access Administrator", "privileged": true },
+  { "name": "Helpdesk Administrator", "privileged": true },
+  { "name": "Global Reader", "privileged": false },
+  { "name": "Security Reader", "privileged": false },
+  { "name": "Reports Reader", "privileged": false },
+  { "name": "Directory Readers", "privileged": false }
+]

@@ -1,0 +1,6 @@
+[
+  {
+    "name": "pilot-ring",
+    "convention": "(?i)(pilot|preview|ring\\s*0|ring\\s*1|early|test|canary|first)"
+  }
+]

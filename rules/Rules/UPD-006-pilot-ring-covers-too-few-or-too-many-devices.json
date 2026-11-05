@@ -1,0 +1,57 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-006",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "UPD",
+  "title": "Pilot ring covers too few or too many devices",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "UpdateRings",
+    "Devices"
+  ],
+  "scope": "Facts.UpdateRings",
+  "where": "Ref.Naming.Matches(it.Name, 'pilot-ring')",
+  "when": "Pct(it.TargetedDeviceCount, Facts.Devices.WindowsCount) < params.minPct || Pct(it.TargetedDeviceCount, Facts.Devices.WindowsCount) > params.maxPct",
+  "params": {
+    "maxPct": {
+      "default": 10,
+      "range": [
+        1,
+        100
+      ],
+      "text": "Above this the pilot is the estate"
+    },
+    "minPct": {
+      "default": 1,
+      "range": [
+        0,
+        50
+      ],
+      "text": "Below this the pilot proves little"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} pilot {Plural(Items.Count, 'ring is', 'rings are')} poorly sized",
+    "columns": {
+      "Ring": "it.Name",
+      "Devices": "it.TargetedDeviceCount",
+      "Share": "Pct(it.TargetedDeviceCount, Facts.Devices.WindowsCount)"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A pilot too small will not surface hardware-specific problems; one too large means a bad update affects most of the organisation anyway.",
+    "remediation": [
+      "Aim for between one and ten per cent of Windows devices, chosen to cover the hardware models in use."
+    ],
+    "cannotSee": "Which ring is the pilot is read from its name, because Intune marks no ring as one: against the pilot-ring pattern of the customer's naming convention file where it sets one, and a pattern the pack carries otherwise. A tenant that names its rings something the pattern does not recognise has no pilot as far as this rule is concerned, and is passed over rather than reported."
+  }
+}

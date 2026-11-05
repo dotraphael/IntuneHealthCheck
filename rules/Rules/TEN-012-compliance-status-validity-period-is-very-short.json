@@ -1,0 +1,45 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "TEN-012",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "TEN",
+  "title": "Compliance status validity period is very short",
+  "type": "Misconfiguration",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Tenant.SettingsKnown",
+  "requires": [
+    "Tenant"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.Tenant.ComplianceCheckinThresholdDays > 0 && Facts.Tenant.ComplianceCheckinThresholdDays < params.minDays",
+  "params": {
+    "minDays": {
+      "default": 7,
+      "range": [
+        1,
+        30
+      ],
+      "text": "Days below which normal absence starts to block users"
+    }
+  },
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Devices switched off over a holiday or a long weekend return marked non-compliant and blocked, generating service desk calls that have nothing to do with security.",
+    "remediation": [
+      "Raise the compliance status validity period to at least seven days."
+    ],
+    "cannotSee": "A tenant that reports no validity period at all reads as zero here and is left alone, because zero is the absence of an answer rather than a very short one."
+  },
+  "related": [
+    "TEN-006"
+  ]
+}

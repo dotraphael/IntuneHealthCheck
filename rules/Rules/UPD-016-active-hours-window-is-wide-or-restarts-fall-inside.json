@@ -1,0 +1,50 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-016",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "UPD",
+  "title": "Active hours window is wide or restarts fall inside it",
+  "type": "Misconfiguration",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "UpdateRings"
+  ],
+  "scope": "Facts.UpdateRings",
+  "when": "it.ActiveHoursSpan > params.maxHours",
+  "params": {
+    "maxHours": {
+      "default": 12,
+      "range": [
+        4,
+        18
+      ],
+      "text": "Hours during which restarts are suppressed"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} update {Plural(Items.Count, 'ring has', 'rings have')} an active hours window longer than {params.maxHours} hours",
+    "columns": {
+      "Ring": "it.Name",
+      "Active hours": "it.ActiveHoursSpan",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "With a wide active hours window there is little time left for the restart that completes an update, so updates stay pending and deadlines pass without effect.",
+    "remediation": [
+      "Reduce the active hours window to a realistic working day."
+    ],
+    "cannotSee": "The active hours the ring sets are read, not the hours anybody keeps. A window that crosses midnight is measured forwards from its start, so 20:00 to 06:00 is ten hours. A ring that sets no active hours is not judged, since Windows then applies its own and this tool cannot see them."
+  },
+  "related": [
+    "UPD-008"
+  ]
+}

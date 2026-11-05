@@ -1,0 +1,32 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "TEN-008",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "TEN",
+  "title": "Endpoint analytics data collection is not enabled",
+  "type": "MissingCapability",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Tenant.EndpointAnalyticsKnown",
+  "requires": [
+    "Tenant"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.Tenant.EndpointAnalyticsEnabled",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "There is no measurement of start-up time, application reliability or user experience, so device performance complaints cannot be answered with evidence.",
+    "remediation": [
+      "Enable Windows data collection under Reports, Endpoint analytics, Settings."
+    ],
+    "cannotSee": "Only the Windows data collection toggle is read. Whether devices are licensed for Endpoint analytics, and whether their data is arriving, is not."
+  }
+}

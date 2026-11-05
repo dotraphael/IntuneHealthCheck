@@ -1,0 +1,32 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "TEN-010",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "TEN",
+  "title": "Autopilot diagnostics collection is disabled",
+  "type": "Misconfiguration",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Tenant.SettingsKnown",
+  "requires": [
+    "Tenant"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.Tenant.AutopilotDiagnosticsEnabled",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "When a provisioning fails, there is no log to explain why, so the usual answer is to wipe and try again.",
+    "remediation": [
+      "Enable Autopilot diagnostics collection under Tenant administration, Device diagnostics."
+    ],
+    "cannotSee": "Only the tenant-wide toggle is read. Whether a failed provisioning actually produced a log, and whether anyone retrieved it, is not visible here."
+  }
+}

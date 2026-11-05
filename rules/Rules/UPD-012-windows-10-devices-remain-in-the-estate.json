@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-012",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "UPD",
+  "title": "Windows 10 devices remain in the estate",
+  "type": "BestPractice",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Large",
+  "requires": [
+    "Devices"
+  ],
+  "scope": "Facts.Devices",
+  "when": "it.IsWindows10",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'device is', 'devices are')} still running Windows 10",
+    "columns": {
+      "Device": "it.Name",
+      "OS build": "it.OsVersion",
+      "Model": "it.Model",
+      "Last check-in": "it.LastSync:d"
+    },
+    "exposure": "Share(Items.Count, Facts.Devices.WindowsCount)",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "Windows 10 has reached the end of mainstream support, so these devices receive no security updates unless extended support has been purchased separately.",
+    "remediation": [
+      "Establish which devices can upgrade in place and which need replacing on hardware grounds.",
+      "Where extended security updates have been bought, record that and treat this finding as informational."
+    ],
+    "cannotSee": "Windows 10 is read from the build number the device last reported. A device that has not checked in since it was upgraded still reads as Windows 10 here, and a device whose version Graph did not return is not counted at all."
+  },
+  "frameworks": [
+    "CE:security-update-management"
+  ]
+}

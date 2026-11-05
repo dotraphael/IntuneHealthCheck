@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "TEN-002",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "TEN",
+  "title": "Multi-admin approval is missing for one or more high-impact operations",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.ApprovalPolicies.Any(p => p.Enabled)",
+  "requires": [
+    "ApprovalPolicies"
+  ],
+  "scope": "Ref.Approval.HighImpactOperations",
+  "when": "!Facts.ApprovalPolicies.Any(p => p.Enabled && p.Operation == it)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} high-impact {Plural(Items.Count, 'operation is', 'operations are')} not covered by multi-admin approval",
+    "columns": {
+      "Operation": "it"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Approval is in place but does not cover every operation that can reach devices, so the protection can be bypassed simply by choosing a different route.",
+    "remediation": [
+      "Add an access policy for each operation listed.",
+      "Use the same approver group so the process stays consistent."
+    ],
+    "cannotSee": "Intune offers no switch on an access policy, so a policy counts as in force when it names an approver group."
+  },
+  "related": [
+    "TEN-001"
+  ]
+}

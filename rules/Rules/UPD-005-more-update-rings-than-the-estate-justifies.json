@@ -1,0 +1,45 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-005",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "UPD",
+  "title": "More update rings than the estate justifies",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "UpdateRings",
+    "Devices"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.UpdateRings.Count(r => r.Assignments.Any()) > params.maxRings",
+  "params": {
+    "maxRings": {
+      "default": 5,
+      "range": [
+        2,
+        50
+      ],
+      "text": "Rings above which the schedule becomes hard to reason about"
+    }
+  },
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Each ring is a separate schedule to maintain and reconcile, and beyond a handful nobody can say with confidence when a given device will receive a given update.",
+    "remediation": [
+      "Consolidate rings with similar deferrals.",
+      "Use assignment filters rather than new rings for small variations."
+    ]
+  },
+  "related": [
+    "UPD-004"
+  ]
+}

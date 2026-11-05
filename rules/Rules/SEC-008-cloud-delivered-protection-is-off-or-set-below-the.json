@@ -1,0 +1,46 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-008",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "Cloud-delivered protection is off or set below the recommended level",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles",
+    "Baselines"
+  ],
+  "scope": "Facts.Derived.DefenderPolicies",
+  "when": "it.CloudProtection == false || Ref.Defender.IsWeakCloudLevel(it.CloudBlockLevel)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} antivirus {Plural(Items.Count, 'policy is', 'policies are')} not using cloud protection properly",
+    "columns": {
+      "Policy": "it.Name",
+      "Set in": "it.ObjectType",
+      "Cloud protection": "it.CloudProtection",
+      "Block level": "it.CloudBlockLevel",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Devices rely on signatures already downloaded, so brand new threats are missed for hours rather than blocked on first sight.",
+    "remediation": [
+      "Enable cloud-delivered protection and set the block level to High.",
+      "Extend the cloud check timeout to 50 seconds."
+    ],
+    "cannotSee": "What the object asks for is read, not whether a device can reach the cloud service. An estate behind a proxy that blocks it has cloud protection configured and not working, which looks the same here as one where it works. Which block levels count as too low is the pack's judgement rather than Microsoft's: Intune's own default for a new policy is Not configured, which this reports. A Defender setting is read wherever it sits, whether that is an endpoint security policy, a security baseline or a Settings Catalog profile, and the report names which. An object that says nothing about a setting is not reported for it, because saying nothing and switching it off are different things and only the second is a finding."
+  },
+  "frameworks": [
+    "CE:malware-protection"
+  ]
+}

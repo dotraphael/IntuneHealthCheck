@@ -1,0 +1,46 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-038",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "Assigned LAPS policy reaches no managed Windows device",
+  "type": "OperationalFailure",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "Devices",
+    "Groups"
+  ],
+  "scope": "Facts.Derived.LapsReach",
+  "when": "Facts.Devices.WindowsCount > 0 && it.ReachKnown && it.ReachedWindowsCount == 0",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} assigned LAPS {Plural(Items.Count, 'policy reaches', 'policies reach')} no managed Windows device",
+    "columns": {
+      "Policy": "it.PolicyName",
+      "Targets": "it.AssignmentSummary"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The LAPS policy looks assigned, but its known targets hold no managed Windows device, so local administrator passwords stay whatever they were and are neither backed up nor rotated.",
+    "remediation": [
+      "Check the assigned device groups and retarget the policy to the managed Windows devices it was written for."
+    ],
+    "cannotSee": "Whether a policy configures LAPS is read from its settings through the setting map, so a policy the map cannot classify is not considered. User targeting, unread or mixed group membership and assignment filters can change reach, and those assignments are not judged until their effective targets are known. Devices outside Intune are not counted."
+  },
+  "frameworks": [
+    "CE:user-access-control"
+  ],
+  "related": [
+    "SEC-019",
+    "SEC-030",
+    "SEC-036"
+  ]
+}

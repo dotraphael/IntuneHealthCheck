@@ -1,0 +1,34 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-030",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "Windows LAPS is not enabled in Entra ID",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EntraDeviceSettings"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.EntraDeviceSettings.LapsEnabled",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The directory will not accept local administrator passwords, so any LAPS deployment has nowhere to store them and administrators cannot retrieve them.",
+    "remediation": [
+      "Enable Local Administrator Password Solution in the Entra ID device settings."
+    ]
+  },
+  "related": [
+    "SEC-019",
+    "SEC-031"
+  ]
+}

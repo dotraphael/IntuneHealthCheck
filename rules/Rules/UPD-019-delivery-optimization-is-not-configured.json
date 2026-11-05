@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-019",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "UPD",
+  "title": "Delivery Optimization is not configured",
+  "type": "MissingCapability",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Devices.WindowsCount > params.minDevices",
+  "requires": [
+    "ConfigurationProfiles",
+    "Devices"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.ConfigurationProfiles.Any(p => p.ConfiguresDeliveryOptimization && p.Assignments.Any())",
+  "params": {
+    "minDevices": {
+      "default": 100,
+      "range": [
+        10,
+        100000
+      ],
+      "text": "Estate size above which bandwidth becomes a real cost"
+    }
+  },
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Every device downloads every update directly from the internet, which on a site with a modest connection turns patch day into a network problem and slows the roll-out.",
+    "remediation": [
+      "Configure Delivery Optimization with peer caching in group mode, aligned to sites or subnets."
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "TEN-004",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "TEN",
+  "title": "Device diagnostics collection is disabled",
+  "type": "Misconfiguration",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Tenant.SettingsKnown",
+  "requires": [
+    "Tenant"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.Tenant.DeviceDiagnosticsEnabled",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Support staff cannot collect logs from a misbehaving device remotely, so every investigation needs the user's time and often their machine.",
+    "remediation": [
+      "Enable device diagnostics under Tenant administration, Device diagnostics."
+    ],
+    "cannotSee": "Only the tenant-wide toggle is read. Whether logs are actually reaching support, and whether anyone collects them, is not visible here."
+  }
+}

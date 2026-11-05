@@ -1,0 +1,43 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-013",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "A firewall profile is disabled by policy",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies"
+  ],
+  "scope": "Facts.EndpointSecurityPolicies",
+  "where": "it.Category == 'Firewall'",
+  "when": "it.DisabledProfiles.Any()",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} firewall {Plural(Items.Count, 'policy disables', 'policies disable')} a network profile",
+    "columns": {
+      "Policy": "it.Name",
+      "Disabled profiles": "it.DisabledProfiles",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Policy is actively turning the firewall off, most often on the public profile, which is the network where it matters most.",
+    "remediation": [
+      "Enable the firewall on all three profiles and solve the original problem with a rule rather than by disabling it."
+    ]
+  },
+  "frameworks": [
+    "CE:firewalls"
+  ],
+  "related": [
+    "SEC-012"
+  ]
+}

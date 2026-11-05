@@ -1,0 +1,45 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-025",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "UPD",
+  "title": "Assigned feature update policy reaches no managed Windows device",
+  "type": "OperationalFailure",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "FeatureUpdatePolicies",
+    "Devices",
+    "Groups"
+  ],
+  "scope": "Facts.Derived.FeatureUpdateReach",
+  "when": "Facts.Devices.WindowsCount > 0 && it.ReachKnown && it.ReachedWindowsCount == 0",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} assigned feature update {Plural(Items.Count, 'policy reaches', 'policies reach')} no managed Windows device",
+    "columns": {
+      "Policy": "it.PolicyName",
+      "Targets": "it.AssignmentSummary"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The policy meant to hold Windows on a chosen release, or move it to one, reaches none of the managed estate, so devices take feature updates on whatever the update rings allow.",
+    "remediation": [
+      "Check the assigned device groups and retarget the policy to the managed Windows devices it was written for, or delete it if it was superseded."
+    ],
+    "cannotSee": "User targeting, unread or mixed group membership and assignment filters can change reach, and those assignments are not judged until their effective targets are known. A policy assigned to nobody at all is UPD-021's question. Devices outside Intune are not counted."
+  },
+  "frameworks": [
+    "CE:security-update-management"
+  ],
+  "related": [
+    "UPD-021",
+    "UPD-003"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-019",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "No Windows LAPS policy",
+  "type": "MissingCapability",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Devices.WindowsCount > 0",
+  "requires": [
+    "EndpointSecurityPolicies"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.Derived.SecuritySettings.CanJudge('Laps') && !Facts.EndpointSecurityPolicies.Any(p => p.Category == 'AccountProtection' && p.ConfiguresLaps)",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Local administrator passwords are unmanaged, which in most estates means they are the same on every device. One recovered password becomes administrative access everywhere.",
+    "remediation": [
+      "Create a Local admin password solution policy under Endpoint security, Account protection.",
+      "Back up passwords to Entra ID and rotate them automatically."
+    ],
+    "cannotSee": "Whether a Settings Catalog policy configures LAPS is read from its settings. Until that mapping is verified against a tenant this rule reports nothing rather than reporting every tenant as missing LAPS. A legacy Account protection intent is not counted because its template subtype does not say whether its settings configure LAPS."
+  },
+  "frameworks": [
+    "CE:user-access-control"
+  ],
+  "related": [
+    "SEC-020",
+    "SEC-030",
+    "ENR-018",
+    "SEC-033"
+  ]
+}

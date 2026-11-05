@@ -1,0 +1,46 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-021",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "UPD",
+  "title": "An update policy is not assigned to anything",
+  "type": "Hygiene",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "UpdateRings",
+    "FeatureUpdatePolicies",
+    "QualityUpdatePolicies",
+    "DriverUpdatePolicies"
+  ],
+  "scope": "Facts.Derived.UpdatePolicies",
+  "when": "!it.Assignments.Any()",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} update {Plural(Items.Count, 'policy reaches', 'policies reach')} no devices",
+    "columns": {
+      "Policy": "it.Name",
+      "Kind": "it.ObjectType",
+      "Modified": "it.LastModified:d"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Update settings somebody configured govern nothing. The devices they were written for patch on whatever schedule they had before, and the estate is less controlled than the console suggests.",
+    "technicalDetail": "Covers update rings and the feature, quality and driver update policies. An unassigned policy is not an error in Intune and nothing in the console draws attention to it.",
+    "remediation": [
+      "Assign each policy that is still wanted to the group it was written for.",
+      "Delete the ones that were superseded, so the console shows what is actually in force."
+    ],
+    "cannotSee": "Whether an unassigned policy is unfinished work or a deliberate draft cannot be told apart from outside, and a policy assigned only to an excluded group reads as assigned here."
+  },
+  "related": [
+    "UPD-001",
+    "UPD-014"
+  ]
+}

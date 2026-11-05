@@ -1,0 +1,41 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-009",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "UPD",
+  "title": "Update ring is paused",
+  "type": "OperationalFailure",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "UpdateRings"
+  ],
+  "scope": "Facts.UpdateRings",
+  "when": "it.QualityUpdatesPaused == true || it.FeatureUpdatesPaused == true",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} update {Plural(Items.Count, 'ring is', 'rings are')} paused",
+    "columns": {
+      "Ring": "it.Name",
+      "Quality paused": "it.QualityUpdatesPaused",
+      "Feature paused": "it.FeatureUpdatesPaused",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Updates are not being delivered at all to these devices. Pauses are usually applied for a reason and forgotten once the reason passes.",
+    "remediation": [
+      "Resume the ring, or record why it remains paused and set a date to review it."
+    ],
+    "cannotSee": "A pause is read from the ring, not from why somebody set it. A pause put on this morning for a bad update looks exactly like one forgotten a year ago, and only the second is a finding, so the ring's own history is worth a look before acting."
+  },
+  "frameworks": [
+    "CE:security-update-management"
+  ]
+}

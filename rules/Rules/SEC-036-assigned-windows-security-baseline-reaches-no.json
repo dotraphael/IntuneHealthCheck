@@ -1,0 +1,43 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-036",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "Assigned Windows security baseline reaches no managed device",
+  "type": "OperationalFailure",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Baselines",
+    "Devices",
+    "Groups"
+  ],
+  "scope": "Facts.Derived.BaselineReach",
+  "when": "Facts.Devices.WindowsCount > 0 && it.ReachKnown && it.ReachedWindowsCount == 0",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} assigned Windows {Plural(Items.Count, 'baseline reaches', 'baselines reach')} no managed device",
+    "columns": {
+      "Baseline": "it.BaselineName",
+      "Targets": "it.AssignmentSummary"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The baseline appears assigned but its known device targets contain no managed Windows device, so it hardens none of the assessed estate.",
+    "remediation": [
+      "Check the assigned device groups and retarget the baseline to the intended managed Windows devices."
+    ],
+    "cannotSee": "User targeting, unread or mixed group membership, and assignment filters can change reach. Those assignments are not judged until their effective targets are known. This check covers Settings Catalog baselines and managed Windows devices in the assessment; legacy intents have no collected assignment targets, and devices outside Intune are not counted."
+  },
+  "related": [
+    "SEC-023",
+    "SEC-025",
+    "HYG-005"
+  ]
+}

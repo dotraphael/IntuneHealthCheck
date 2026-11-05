@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-001",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "UPD",
+  "title": "No update ring is assigned to Windows devices",
+  "type": "MissingCapability",
+  "severity": "Critical",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Devices.WindowsCount > 0",
+  "requires": [
+    "UpdateRings"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.UpdateRings.Any(r => r.Assignments.Any())",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Nothing governs when security updates install. Devices patch on their own schedule or not at all, and there is no way to say how exposed the estate is to a given vulnerability.",
+    "remediation": [
+      "Create at least a pilot ring and a broad ring, with the pilot a week ahead.",
+      "Set a deadline so installation is enforced rather than optional."
+    ]
+  },
+  "frameworks": [
+    "CE:security-update-management"
+  ],
+  "related": [
+    "UPD-002",
+    "UPD-004"
+  ]
+}

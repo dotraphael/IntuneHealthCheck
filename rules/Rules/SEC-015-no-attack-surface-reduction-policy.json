@@ -1,0 +1,43 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-015",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "No attack surface reduction policy",
+  "type": "MissingCapability",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Devices.WindowsCount > 0",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "LegacyIntents",
+    "LegacyTemplates"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.EndpointSecurityPolicies.Any(p => p.Category == 'AttackSurfaceReduction') && !Facts.LegacyIntents.Any(p => p.Category == 'AttackSurfaceReduction')",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A set of protections already licensed and available is not switched on. These rules block the techniques that begin most commodity attacks, such as Office applications spawning executables.",
+    "remediation": [
+      "Create an attack surface reduction policy.",
+      "Deploy the recommended rules in audit mode first, review for a fortnight, then switch to block."
+    ],
+    "cannotSee": "Settings Catalog policies and classified legacy intents are checked for existence, not whether they work. A legacy intent is classified from its template subtype; its settings and assignment targets are not read. SEC-033 checks assignment only for Settings Catalog policies. If legacy intents or their templates cannot be read or classified, this absence check is skipped."
+  },
+  "frameworks": [
+    "CE:malware-protection"
+  ],
+  "related": [
+    "SEC-016",
+    "SEC-017",
+    "SEC-033"
+  ]
+}

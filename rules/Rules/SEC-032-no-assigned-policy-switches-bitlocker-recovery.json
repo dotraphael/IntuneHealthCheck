@@ -1,0 +1,41 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-032",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SEC",
+  "title": "No assigned policy switches BitLocker recovery password rotation on",
+  "type": "MissingCapability",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles",
+    "Baselines",
+    "LegacyIntents",
+    "LegacyTemplates"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.Derived.EncryptionPolicies.Any(p => p.IsAssigned && (p.RecoveryPasswordRotation == 'Entra joined' || p.RecoveryPasswordRotation == 'Entra and hybrid joined')) && !Facts.ConfigurationProfiles.Any(p => p.IsAssigned && p.OmaSettings.Any(o => MatchName(o.Uri, '*/BitLocker/ConfigureRecoveryPasswordRotation'))) && !Facts.LegacyIntents.Any(p => p.Category == 'DiskEncryption' && p.IsAssigned)",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A recovery password stays valid after it has been used to unlock a device. Anybody who was given it, or looked it up, can unlock that device again later, and nothing records that they still can.",
+    "remediation": [
+      "In an assigned disk encryption policy, set Configure Recovery Password Rotation to refresh on for Entra ID-joined devices, or for both Entra ID-joined and hybrid-joined devices where the estate has hybrid devices.",
+      "Rotation only happens where the recovery password is backed up, to Entra ID for joined devices and to Active Directory for hybrid ones, so require that backup in the same policy."
+    ],
+    "cannotSee": "The setting is read from endpoint security disk encryption policies, Settings Catalog profiles, security baselines and Endpoint Protection template profiles, and only an assigned one counts, because a policy nobody receives rotates nothing. An assigned custom OMA-URI profile that sets this value, or an assigned disk encryption policy made from the older endpoint security templates, cannot be read, so either one keeps this check quiet rather than risk reporting a tenant that has rotation on. Whether the assigned policy reaches every Windows device, and whether any key has been rotated, is not seen. Microsoft's documentation disagrees about what Windows does when nothing is configured; this follows Intune's setting reference, which says the device does not rotate."
+  },
+  "related": [
+    "SEC-035",
+    "SEC-002",
+    "SEC-039"
+  ]
+}

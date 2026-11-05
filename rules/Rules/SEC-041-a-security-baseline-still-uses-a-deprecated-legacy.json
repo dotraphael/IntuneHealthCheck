@@ -1,0 +1,44 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-041",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "A security baseline still uses a deprecated legacy template",
+  "type": "BestPractice",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Medium",
+  "requires": [
+    "LegacyIntents",
+    "LegacyTemplates"
+  ],
+  "scope": "Facts.LegacyIntents",
+  "when": "it.BaselineProduct != '' && it.IsAssigned && it.TemplateIsCurrent == false",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} assigned security {Plural(Items.Count, 'baseline uses', 'baselines use')} a deprecated legacy template",
+    "columns": {
+      "Baseline": "it.Name",
+      "Product": "it.BaselineProduct",
+      "Template": "it.TemplateName",
+      "Version": "it.TemplateVersion"
+    },
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A baseline on a deprecated template receives none of Microsoft's newer recommendations and can no longer be edited, so the protection it enforces is fixed at an older idea of good.",
+    "technicalDetail": "Older security baselines were built on Intune's legacy templates, which Microsoft has replaced with Settings Catalog templates. A legacy baseline cannot be moved to the new format in place; it has to be recreated.",
+    "remediation": [
+      "Create a baseline from the current version of the same product under Endpoint security, Security baselines, and compare its settings with the old one.",
+      "Move the assignment to the new baseline, confirm devices report it as applied, then delete the old one."
+    ],
+    "cannotSee": "Which devices the baseline reaches: a legacy baseline's assignments are not read, so this finding is weighed at the floor rather than by its reach. Its settings are not compared with Microsoft's defaults either. A template whose state Graph did not return leaves the baseline unjudged."
+  },
+  "related": [
+    "SEC-023",
+    "SEC-024"
+  ]
+}

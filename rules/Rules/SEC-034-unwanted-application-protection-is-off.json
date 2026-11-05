@@ -1,0 +1,46 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-034",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SEC",
+  "title": "Unwanted application protection is off",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles",
+    "Baselines"
+  ],
+  "scope": "Facts.Derived.DefenderPolicies",
+  "when": "(it.PuaProtection == 'Disabled' || it.SmartScreenPuaProtection == 'Disabled') && !Facts.Derived.SecuritySettings.IsEnforced('UnwantedApplicationProtection')",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} antivirus {Plural(Items.Count, 'policy switches', 'policies switch')} unwanted application protection off",
+    "columns": {
+      "Policy": "it.Name",
+      "Set in": "it.ObjectType",
+      "Unwanted applications": "it.UnwantedApplications",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Bundled software that is not malware but is not wanted either, browser toolbars, cryptocurrency miners and the installers that carry them, is allowed to install without objection. It is a support cost before it is a security one.",
+    "remediation": [
+      "Set potentially unwanted application protection to Block.",
+      "Where it is in audit mode, review what it would have blocked first, since a genuine business tool occasionally trips it."
+    ],
+    "cannotSee": "Two settings switch this protection off, Defender's own and the SmartScreen one reached through the browser, and either being off is reported. Only a value this tool has read off a tenant is acted on, so an object that leaves the setting alone is not reported even though a device ends up the same. Where a security baseline or a configuration profile assigned in the same tenant switches the protection on, the object is passed over, because the device ends up protected whichever object did it. A Defender setting is read wherever it sits, whether that is an endpoint security policy, a security baseline or a Settings Catalog profile, and the report names which. An object that says nothing about a setting is not reported for it, because saying nothing and switching it off are different things and only the second is a finding."
+  },
+  "related": [
+    "SEC-011",
+    "SEC-007"
+  ]
+}

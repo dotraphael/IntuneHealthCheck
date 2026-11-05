@@ -1,0 +1,50 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-022",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SEC",
+  "title": "Application control is only auditing",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies"
+  ],
+  "scope": "Facts.EndpointSecurityPolicies",
+  "where": "(it.Category == 'AppControl' || it.Category == 'AppLocker')",
+  "when": "it.Mode == 'Audit' && DaysSince(it.LastModified) > params.settledDays",
+  "params": {
+    "settledDays": {
+      "default": 90,
+      "range": [
+        7,
+        730
+      ],
+      "text": "Days after which an audit deployment has stopped being a trial"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} application control {Plural(Items.Count, 'policy has', 'policies have')} been auditing for a long time",
+    "columns": {
+      "Policy": "it.Name",
+      "Mode": "it.Mode",
+      "Modified": "it.LastModified:d"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The evaluation appears to have stalled. Nothing is being blocked, so the protection exists in name only.",
+    "remediation": [
+      "Review the audit events, build the allow rules the estate needs, and move to enforcement on a pilot group first."
+    ]
+  },
+  "related": [
+    "SEC-021"
+  ]
+}

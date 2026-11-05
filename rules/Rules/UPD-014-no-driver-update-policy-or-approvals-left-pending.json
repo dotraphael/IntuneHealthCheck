@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-014",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "UPD",
+  "title": "No driver update policy, or approvals left pending",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "DriverUpdatePolicies"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.DriverUpdatePolicies.Any(p => p.Assignments.Any()) || Facts.DriverUpdatePolicies.Any(p => p.PendingApprovalDays != null && p.PendingApprovalDays > params.maxPendingDays)",
+  "params": {
+    "maxPendingDays": {
+      "default": 30,
+      "range": [
+        1,
+        365
+      ],
+      "text": "Days a driver approval may sit unactioned"
+    }
+  },
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Driver and firmware updates carry security fixes as well as stability fixes, and where approval is manual the queue tends to be nobody's job.",
+    "remediation": [
+      "Create a driver update policy, using automatic approval for the broad population.",
+      "Where manual approval is deliberate, put a recurring review in someone's calendar."
+    ],
+    "cannotSee": "Whether a policy exists and is assigned is read. How long a driver has been waiting for approval is not: the approval queue is a call of its own that this release does not make, so the second half of this rule reports nothing and a tenant with a manual policy and a year of pending drivers reads as covered. The policy's approval type is worth checking by hand where one exists."
+  }
+}

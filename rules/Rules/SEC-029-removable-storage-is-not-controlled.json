@@ -1,0 +1,34 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-029",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SEC",
+  "title": "Removable storage is not controlled",
+  "type": "MissingCapability",
+  "severity": "Low",
+  "confidence": "Medium",
+  "effort": "Small",
+  "applies": "Facts.Devices.WindowsCount > 0 && Facts.Derived.SecuritySettings.CanJudge('RemovableStorageControl')",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.Derived.SecuritySettings.IsEnforced('RemovableStorageControl')",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Data can leave on a USB stick and malware can arrive on one, with no record either way.",
+    "remediation": [
+      "Decide the position: block, allow read-only, or require encryption on removable drives.",
+      "Where BitLocker To Go is the answer, require it in the disk encryption policy."
+    ],
+    "cannotSee": "Only whether removable storage is restricted at all is read, not how. A tenant that allows removable storage deliberately, and controls what may be copied to it through information protection instead, is doing the harder half of the job and reads here as doing nothing. Read-only and blocked are not told apart. A setting this tool has no mapping for is not looked for at all and the rule is then not applicable rather than raised."
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-007",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "UPD",
+  "title": "Quality update deferral is long",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "UpdateRings"
+  ],
+  "scope": "Facts.UpdateRings",
+  "where": "!it.IsAutopatchManaged && it.QualityDeferralDays != null",
+  "when": "it.QualityDeferralDays > params.maxDeferralDays",
+  "params": {
+    "maxDeferralDays": {
+      "default": 14,
+      "range": [
+        0,
+        30
+      ],
+      "text": "Days a security update may be held back"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} update {Plural(Items.Count, 'ring defers', 'rings defer')} security updates for more than {params.maxDeferralDays} days",
+    "columns": {
+      "Ring": "it.Name",
+      "Deferral": "it.QualityDeferralDays",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Devices remain exposed to publicly known vulnerabilities for the whole deferral, and the details of those vulnerabilities are published the day the update is released.",
+    "remediation": [
+      "Reduce the quality update deferral to no more than seven days for the broad ring and zero for the pilot."
+    ]
+  },
+  "frameworks": [
+    "CE:security-update-management"
+  ],
+  "related": [
+    "UPD-008"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-010",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "Antivirus exclusions are unusually broad",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles",
+    "Baselines"
+  ],
+  "scope": "Facts.Derived.DefenderPolicies",
+  "when": "Ref.Defender.HasBroadExclusion(it.Exclusions)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} antivirus {Plural(Items.Count, 'policy contains', 'policies contain')} a broad exclusion",
+    "columns": {
+      "Policy": "it.Name",
+      "Set in": "it.ObjectType",
+      "Exclusions": "Ref.Defender.BroadExclusions(it.Exclusions)",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Excluding a whole drive, a user profile or a wildcard path creates a location where malware is never inspected, and attackers look for exactly these paths.",
+    "remediation": [
+      "Replace broad exclusions with the narrowest path or process that solves the original problem.",
+      "Record why each remaining exclusion exists and review them annually."
+    ],
+    "cannotSee": "The exclusion paths an object sets are read, not the exclusions a device has for any other reason, and not what is actually kept in the paths named. Which patterns count as too broad is the pack's judgement, so an exclusion the list does not match is not reported even where a reader would think it wide. A Defender setting is read wherever it sits, whether that is an endpoint security policy, a security baseline or a Settings Catalog profile, and the report names which. An object that says nothing about a setting is not reported for it, because saying nothing and switching it off are different things and only the second is a finding."
+  },
+  "frameworks": [
+    "CE:malware-protection"
+  ],
+  "related": [
+    "SEC-018"
+  ]
+}

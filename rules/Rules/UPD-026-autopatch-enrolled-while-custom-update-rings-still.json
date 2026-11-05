@@ -1,0 +1,45 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-026",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "UPD",
+  "title": "Autopatch enrolled while custom update rings still target devices",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Medium",
+  "applies": "Facts.Tenant.AutopatchEnrolled",
+  "requires": [
+    "Tenant",
+    "UpdateRings"
+  ],
+  "scope": "Facts.UpdateRings",
+  "where": "it.Assignments.Any() && !it.IsAutopatchManaged",
+  "when": "true",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} custom update {Plural(Items.Count, 'ring still targets', 'rings still target')} devices while Autopatch is enrolled",
+    "columns": {
+      "Ring": "it.Name",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Two patching control planes reach the estate at once. Devices can sit in a hand-built ring and an Autopatch ring, so deadlines and deferrals disagree and nobody owns the outcome.",
+    "remediation": [
+      "Retire or unassign custom rings Autopatch has replaced, or exclude those device groups from Autopatch until the cut-over is finished."
+    ],
+    "cannotSee": "Autopatch ownership is inferred from ring names (IsAutopatchManaged). A renamed Autopatch ring reads as custom. Whether the custom ring and an Autopatch ring actually overlap on devices is UPD-003 and UPD-024 territory."
+  },
+  "related": [
+    "TEN-007",
+    "UPD-022",
+    "UPD-001"
+  ]
+}

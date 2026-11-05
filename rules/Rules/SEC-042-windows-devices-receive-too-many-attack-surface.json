@@ -1,0 +1,59 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-042",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SEC",
+  "title": "Windows devices receive too many attack surface reduction policies",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Medium",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "Devices",
+    "Groups"
+  ],
+  "scope": "Facts.Derived.AsrPolicyStacks",
+  "when": "it.PolicyCount > params.maxPolicies",
+  "params": {
+    "maxPolicies": {
+      "default": 5,
+      "range": [
+        2,
+        20
+      ],
+      "text": "Attack surface reduction rule policies one device may receive before the set is hard to follow"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Sum(i => i.DeviceCount)} Windows {Plural(Items.Sum(i => i.DeviceCount), 'device receives', 'devices receive')} more than {params.maxPolicies} attack surface reduction policies",
+    "columns": {
+      "Policies": "it.Policies",
+      "Policy count": "it.PolicyCount",
+      "Devices": "it.DeviceCount",
+      "For example": "it.ExampleDevices"
+    },
+    "exposure": "Share(Items.Sum(i => i.DeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Some devices take their attack surface reduction rules from more than {params.maxPolicies} policies at once. Intune combines them, and a rule that two of those policies set differently is held back from the device altogether, so the more policies overlap, the more likely a protection is silently missing and the harder it is to say what any device enforces.",
+    "technicalDetail": "Counts, for each managed Windows device, the assigned attack surface reduction policies that configure at least one rule, and lists each distinct set of more than {params.maxPolicies}. Many policies across the tenant are not a finding: only policies that reach the same devices are counted together.",
+    "remediation": [
+      "Consolidate the policies in each listed set into fewer policies, ideally one baseline set of rules for every device and a small number of exceptions.",
+      "Where a set is intended, check the policy's per-setting status in the Intune admin center for rules reported in conflict."
+    ],
+    "cannotSee": "Only endpoint security policies are counted, so rules delivered through a security baseline, an endpoint protection profile or a custom profile are not. A policy targeted at users, at a group whose members were not read, at a mixed group or through an assignment filter has unknown reach and is left out, so a device may receive more policies than counted, never fewer. Whether two policies actually set the same rule differently is not compared."
+  },
+  "frameworks": [
+    "CE:malware-protection"
+  ],
+  "related": [
+    "SEC-016",
+    "SEC-037"
+  ]
+}

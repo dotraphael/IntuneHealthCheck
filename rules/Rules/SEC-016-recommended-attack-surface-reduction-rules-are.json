@@ -1,0 +1,50 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-016",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "Recommended attack surface reduction rules are missing",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles",
+    "Baselines",
+    "Devices",
+    "Groups"
+  ],
+  "scope": "Facts.Derived.AsrRuleSets",
+  "when": "it.Known && Ref.Asr.MissingRecommended(it.Rules).Any()",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Sum(i => i.DeviceCount)} Windows {Plural(Items.Sum(i => i.DeviceCount), 'device is', 'devices are')} missing recommended attack surface reduction rules",
+    "columns": {
+      "Missing": "Ref.Asr.MissingRecommended(it.Rules)",
+      "Rules set by": "it.Sources.Length == 0 ? 'nothing assigned' : it.Sources",
+      "Devices": "it.DeviceCount",
+      "For example": "it.ExampleDevices"
+    },
+    "exposure": "Share(Items.Sum(i => i.DeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Some Windows devices are not given one or more of the attack surface reduction rules that are safe to switch on everywhere. Those rules stop credentials being read from memory, vulnerable drivers being abused and malware hiding itself in WMI, at almost no cost to legitimate software, so a device without them is open to techniques common in real attacks.",
+    "technicalDetail": "Works out, for each managed Windows device, the rules every assigned attack surface reduction policy, Settings Catalog profile and security baseline that reaches it sets, in block, audit or warn, since Intune merges them all on the device, and lists the devices grouped by the objects they receive. The recommended rules are Microsoft's standard protection rules. A rule in audit or warn counts as given here; SEC-017 reports it left there.",
+    "remediation": [
+      "Set the missing rules to block in an attack surface reduction policy that reaches these devices, or assign one where nothing is assigned. Microsoft considers these rules safe to block without an audit period first.",
+      "Where the Configuration Manager client is installed, run the WMI event subscription rule in audit and review its events before blocking, because the client relies on WMI.",
+      "Where Local Security Authority protection is already on, the credential stealing rule adds little; record that as the reason it is not set."
+    ],
+    "cannotSee": "The recommended set ships in the rule pack and follows Microsoft's standard protection rules. Rules set by an Endpoint protection template profile, Group Policy or Configuration Manager are not read, so a device protected only that way is reported. An object whose reach is unknown, through users, an unread or mixed group or a filter, counts its rules on every device, so a device is reported only for a rule nothing could have given it; an object whose settings were not read leaves the devices it might reach unjudged. A Windows device with no Entra device identifier is not placed. Intune holds back a rule two objects set differently, which is counted here as given; SEC-042 is where overlapping policies are judged."
+  },
+  "related": [
+    "SEC-017",
+    "SEC-037",
+    "SEC-042"
+  ]
+}

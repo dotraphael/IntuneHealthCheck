@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-026",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SEC",
+  "title": "The same security setting is configured in both endpoint security and a configuration profile",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles"
+  ],
+  "scope": "Facts.Derived.SettingOverlaps",
+  "when": "it.SpansPolicyTypes",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} security {Plural(Items.Count, 'setting is', 'settings are')} configured in more than one place",
+    "columns": {
+      "Setting": "it.SettingName",
+      "Policies": "it.ProfileNames",
+      "Values": "it.Values"
+    },
+    "exposure": "Share(Items.Sum(i => i.DeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Two consoles are configuring the same thing, so a change made in one is silently undone or contradicted by the other.",
+    "remediation": [
+      "Decide which surface owns each setting, endpoint security or configuration, and remove it from the other."
+    ]
+  },
+  "related": [
+    "CFG-005"
+  ]
+}

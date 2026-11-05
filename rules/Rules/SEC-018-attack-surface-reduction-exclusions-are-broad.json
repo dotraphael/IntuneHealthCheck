@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-018",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SEC",
+  "title": "Attack surface reduction exclusions are broad",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies"
+  ],
+  "scope": "Facts.EndpointSecurityPolicies",
+  "where": "it.Category == 'AttackSurfaceReduction'",
+  "when": "Ref.Asr.HasBroadExclusion(it.AsrExclusions)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'policy contains', 'policies contain')} broad attack surface reduction exclusions",
+    "columns": {
+      "Policy": "it.Name",
+      "Exclusions": "Ref.Asr.BroadExclusions(it.AsrExclusions)"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A broad exclusion disables the protection for a whole path or process family, which is usually wider than the application that prompted it.",
+    "remediation": [
+      "Narrow each exclusion to the specific executable or path that needs it."
+    ]
+  },
+  "related": [
+    "SEC-010"
+  ]
+}

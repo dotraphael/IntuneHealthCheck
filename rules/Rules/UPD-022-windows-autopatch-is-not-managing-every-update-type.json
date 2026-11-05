@@ -1,0 +1,47 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-022",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "UPD",
+  "title": "Windows Autopatch is not managing every update type",
+  "type": "MissingCapability",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Small",
+  "applies": "Facts.Tenant.AutopatchEnrolled",
+  "requires": [
+    "Tenant",
+    "UpdateRings",
+    "FeatureUpdatePolicies",
+    "DriverUpdatePolicies",
+    "ConfigurationProfiles"
+  ],
+  "scope": "Facts.Derived.Autopatch.UpdateTypes",
+  "when": "!it.Managed",
+  "report": {
+    "mode": "aggregate",
+    "title": "Windows Autopatch is not managing {Items.Count} update {Plural(Items.Count, 'type', 'types')}",
+    "columns": {
+      "Update type": "it.UpdateType",
+      "Looked for": "it.LookedFor"
+    },
+    "exposure": "1",
+    "maxRows": 10
+  },
+  "messages": {
+    "businessImpact": "Part of the estate's patching is still somebody's manual job while the tenant pays for a service that would do it. Whatever Autopatch does not manage is updated on a schedule nobody reviews, and the two halves drift apart.",
+    "technicalDetail": "Autopatch creates one object per update type per deployment ring and names each after itself. What it has created is what it manages.",
+    "remediation": [
+      "Turn on the update types Autopatch is not managing in the Autopatch group's deployment settings: Windows quality, Windows feature, driver and firmware, Microsoft 365 Apps and Microsoft Edge.",
+      "Retire the hand-built policies each one replaces, so two mechanisms are not deploying the same updates."
+    ],
+    "cannotSee": "Read from the names of the objects Autopatch creates for each deployment ring, because Intune marks them no other way. The objects Autopatch creates for the whole tenant when it enrols, the global DSS policy among them, are left out: they are there whether or not a group has been given that update type. A tenant that renamed one reads as having taken that update type back, and an update type enabled minutes ago reads as unmanaged until Autopatch has created its policies."
+  },
+  "related": [
+    "TEN-007",
+    "UPD-023"
+  ]
+}

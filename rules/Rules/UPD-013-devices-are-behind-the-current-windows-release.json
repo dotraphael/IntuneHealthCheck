@@ -1,0 +1,66 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-013",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "UPD",
+  "title": "Devices are behind the current Windows release",
+  "type": "OperationalFailure",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Devices",
+    "WindowsBuilds"
+  ],
+  "scope": "Facts.Devices",
+  "where": "it.IsWindows && DaysSince(it.LastSync) <= params.activeDays",
+  "when": "Ref.WindowsBuilds.MonthsBehind(it.OsVersion) > params.maxMonthsBehind",
+  "params": {
+    "activeDays": {
+      "default": 30,
+      "range": [
+        1,
+        180
+      ],
+      "text": "Days within which a device must have checked in to be counted"
+    },
+    "maxMonthsBehind": {
+      "default": 2,
+      "range": [
+        0,
+        24
+      ],
+      "text": "Months behind the current build before a device is treated as unpatched"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} active {Plural(Items.Count, 'device is', 'devices are')} more than {params.maxMonthsBehind} months behind on updates",
+    "columns": {
+      "Device": "it.Name",
+      "OS build": "it.OsVersion",
+      "Months behind": "Ref.WindowsBuilds.MonthsBehind(it.OsVersion)",
+      "Last check-in": "it.LastSync:d"
+    },
+    "exposure": "Share(Items.Count, Facts.Devices.WindowsCount)",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "These devices are running with publicly documented vulnerabilities unpatched, while checking in normally, so nothing else in the service is flagging them.",
+    "remediation": [
+      "Check the update ring covering them for a deferral, a pause or a missing deadline.",
+      "Look for a shared cause: a site, a hardware model or a network path."
+    ],
+    "cannotSee": "This measures which Windows release a device is on against the newest the Windows build list holds, not which monthly update it has: no fact the tool collects says whether last Tuesday's patch landed. A build the list does not carry a release date for is not judged, so an unfilled list reports nothing rather than everything."
+  },
+  "frameworks": [
+    "CE:security-update-management"
+  ],
+  "related": [
+    "UPD-008",
+    "UPD-009"
+  ]
+}

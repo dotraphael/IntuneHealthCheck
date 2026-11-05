@@ -1,0 +1,49 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "TEN-009",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "TEN",
+  "title": "Only the default scope tag exists",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.IntuneRoleAssignments.Count() >= params.minRoleAssignments",
+  "requires": [
+    "ScopeTags",
+    "IntuneRoleAssignments"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.ScopeTags.Any() && !Facts.ScopeTags.Any(tag => !tag.IsDefault)",
+  "params": {
+    "minRoleAssignments": {
+      "default": 2,
+      "range": [
+        1,
+        50
+      ],
+      "text": "Role assignments below which one team administers everything and scope tags buy nothing"
+    }
+  },
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Every administrator sees every object. In an organisation with more than one support team that means changes intended for one group can reach all of them.",
+    "technicalDetail": "{Facts.ScopeTags.Count()} scope tags were read from this tenant, and none of them is a tag someone created. Scope tags are under Tenant administration, Roles, Scope (Tags).",
+    "remediation": [
+      "Create scope tags for the boundaries that matter, by region, business unit or support tier.",
+      "Apply them to objects and to role assignments together, since a tag on one without the other has no effect."
+    ],
+    "cannotSee": "A run that read no scope tag at all is left alone rather than reported as having only the default, because every tenant has the default and an empty read is a reading failure rather than a finding."
+  },
+  "related": [
+    "ACC-007",
+    "HYG-010"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-004",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SEC",
+  "title": "Encryption strength is below the recommended level",
+  "type": "BestPractice",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles",
+    "Baselines"
+  ],
+  "scope": "Facts.Derived.EncryptionPolicies",
+  "when": "Ref.Encryption.IsWeak(it.EncryptionMethod)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} encryption {Plural(Items.Count, 'policy uses', 'policies use')} a weaker cipher than recommended",
+    "columns": {
+      "Policy": "it.Name",
+      "Set in": "it.ObjectType",
+      "Method": "it.EncryptionMethod",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The data is encrypted, but with a weaker cipher than modern hardware supports at no cost in performance.",
+    "remediation": [
+      "Set the encryption method to XTS-AES 256 for fixed drives.",
+      "Changing this does not re-encrypt existing devices; plan a decrypt and re-encrypt if it matters."
+    ],
+    "cannotSee": "The cipher asked for on the operating system drive is read, not the cipher a device is using and not the one asked for on other drives. A device encrypted before the policy reached it keeps the cipher it was encrypted with until it is decrypted and encrypted again, which nothing here can see. Which ciphers count as weak is the pack's list rather than Microsoft's, and it calls XTS-AES 128 weak, which is Intune's own default, so a tenant that accepted the default is meant to see this. A BitLocker setting is read wherever it sits, whether that is an endpoint security policy, a security baseline or a Settings Catalog profile, and the report names which. An object that says nothing about this setting is not reported for it, because saying nothing and switching it off are different things and only the second is a finding."
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-011",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SEC",
+  "title": "Network protection is off",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles",
+    "Baselines"
+  ],
+  "scope": "Facts.Derived.DefenderPolicies",
+  "when": "it.NetworkProtection == 'Disabled' && !Facts.Derived.SecuritySettings.IsEnforced('NetworkProtection')",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} antivirus {Plural(Items.Count, 'policy switches', 'policies switch')} network protection off",
+    "columns": {
+      "Policy": "it.Name",
+      "Set in": "it.ObjectType",
+      "Network protection": "it.NetworkProtection",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Connections to addresses known to serve malware and phishing are allowed to complete, which is one of the cheapest things to prevent and one of the most common ways an attack starts.",
+    "remediation": [
+      "Set network protection to Block in the policy listed.",
+      "Where it is in audit mode, review the audit results first, since it can break a line-of-business application that reaches an address Defender does not like."
+    ],
+    "cannotSee": "What the object asks for is read, not what a device is doing. Only a value this tool has read off a tenant is acted on, and for network protection that is the off setting alone: an object in audit mode is not reported, although auditing a thing is not preventing it, because the option identifier for audit has not been confirmed and reporting a tenant on the strength of a guess is worse than missing it. Network protection also needs real-time protection on to do anything, which SEC-007 asks separately. A Defender setting is read wherever it sits, whether that is an endpoint security policy, a security baseline or a Settings Catalog profile, and the report names which. An object that says nothing about a setting is not reported for it, because saying nothing and switching it off are different things and only the second is a finding."
+  },
+  "related": [
+    "SEC-007",
+    "SEC-034"
+  ]
+}

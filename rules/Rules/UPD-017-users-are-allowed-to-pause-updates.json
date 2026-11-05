@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-017",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "UPD",
+  "title": "Users are allowed to pause updates",
+  "type": "Misconfiguration",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "UpdateRings"
+  ],
+  "scope": "Facts.UpdateRings",
+  "when": "it.AllowUserToPauseUpdates == true",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} update {Plural(Items.Count, 'ring lets', 'rings let')} users pause updates",
+    "columns": {
+      "Ring": "it.Name",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Any user can postpone security updates on their own device, and the people most likely to do so repeatedly are the ones whose devices matter most.",
+    "remediation": [
+      "Turn off the option that allows users to pause updates."
+    ],
+    "cannotSee": "Only a ring that grants the permission is reported. A ring that says nothing leaves the Windows default in place, which is not visible from here and is not the same as refusing it."
+  },
+  "frameworks": [
+    "CE:security-update-management"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-009",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "Tamper protection is not enabled",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Devices.WindowsCount > 0 && Facts.Derived.SecuritySettings.CanJudge('TamperProtection')",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.Derived.SecuritySettings.IsEnforced('TamperProtection')",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Anything running with local administrator rights, including ransomware, can switch off Defender before it does anything else. Tamper protection is what stops that.",
+    "remediation": [
+      "Set Configuration Protection (Device) to Tamper Protection (On) in a Windows Security experience policy and assign it to all Windows devices.",
+      "Check any policy that already carries the setting: Intune preselects Off, so a policy where somebody added the setting and did not choose turns tamper protection off rather than leaving it alone."
+    ],
+    "cannotSee": "Whether an assigned policy switches tamper protection on is read, not whether it is on for a given device: Microsoft turns it on by default for many tenants, and a tenant that manages it from Defender for Endpoint's own portal rather than from Intune is protected without anything here saying so. The antivirus policies and the Settings Catalog profiles are read together, because either can set it. Configuration Protection, which enforces Intune's own configuration and is the stronger of the two modes Microsoft offers in this setting, counts as enforcing it, so the two are not told apart in the report. The setting is in preview and Microsoft may change what its options mean."
+  },
+  "frameworks": [
+    "CE:malware-protection"
+  ],
+  "related": [
+    "SEC-006"
+  ]
+}

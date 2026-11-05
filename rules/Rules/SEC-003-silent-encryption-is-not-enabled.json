@@ -1,0 +1,43 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-003",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "Silent encryption is not enabled",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles",
+    "Baselines"
+  ],
+  "scope": "Facts.Derived.EncryptionPolicies",
+  "when": "it.SilentEncryption == false",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} encryption {Plural(Items.Count, 'policy requires', 'policies require')} user interaction",
+    "columns": {
+      "Policy": "it.Name",
+      "Set in": "it.ObjectType",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Encryption waits for a user to accept a prompt, so devices whose users dismiss it stay unencrypted indefinitely and nobody is told.",
+    "remediation": [
+      "Enable silent encryption, and allow standard users to enable it so no elevation is needed."
+    ],
+    "cannotSee": "What the object asks for is read, not what a device did with it. A device encrypted before the policy reached it is already encrypted whatever the prompt says, and nothing here can tell that from a device still waiting for somebody to accept one. A BitLocker setting is read wherever it sits, whether that is an endpoint security policy, a security baseline or a Settings Catalog profile, and the report names which. An object that says nothing about this setting is not reported for it, because saying nothing and switching it off are different things and only the second is a finding."
+  },
+  "related": [
+    "SEC-001"
+  ]
+}

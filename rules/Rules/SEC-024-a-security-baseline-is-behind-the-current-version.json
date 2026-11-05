@@ -1,0 +1,44 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-024",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "A security baseline is behind the current version",
+  "type": "BestPractice",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Baselines",
+    "PolicyTemplates"
+  ],
+  "scope": "Facts.Baselines",
+  "when": "it.TemplateIsCurrent == false",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} security {Plural(Items.Count, 'baseline is', 'baselines are')} not the current version",
+    "columns": {
+      "Baseline": "it.Name",
+      "Product": "it.Product",
+      "Version": "it.Version",
+      "Latest": "it.LatestTemplateVersion",
+      "State": "it.TemplateLifecycle",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Settings added to protect against newer techniques are missing, and the version in use may configure things Microsoft has since changed its advice about.",
+    "remediation": [
+      "Create a new profile from the current baseline version, compare the differences, and migrate the assignment."
+    ],
+    "cannotSee": "What Microsoft says about the template is read, not what the difference between the versions amounts to. A baseline on a superseded template may be missing a great deal or almost nothing, and this cannot tell which. The judgement is the tenant's own template list rather than a list of versions the pack carries, so a run that could not read that list reports no baseline as behind rather than every one of them, and a lifecycle word this release has no opinion about leaves the baseline unjudged."
+  },
+  "related": [
+    "SEC-023"
+  ]
+}

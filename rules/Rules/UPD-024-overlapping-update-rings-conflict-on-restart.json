@@ -1,0 +1,44 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-024",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "UPD",
+  "title": "Overlapping update rings conflict on restart settings",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Medium",
+  "requires": [
+    "UpdateRings",
+    "Devices",
+    "Groups",
+    "RingRestartConflictCoverage"
+  ],
+  "scope": "Facts.Derived.RingRestartConflicts",
+  "when": "it.OverlapDeviceCount > 0",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} overlapping {Plural(Items.Count, 'ring pair conflicts', 'ring pairs conflict')} on restart settings",
+    "columns": {
+      "Rings": "it.RingNames",
+      "Conflicting settings": "it.ConflictingSettings",
+      "Shared Windows devices": "it.OverlapDeviceCount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The same managed Windows devices receive update rings that choose different install, deadline or grace settings. Their restart behaviour depends on policy conflict handling instead of the intended schedule.",
+    "remediation": [
+      "Make the ring targets mutually exclusive or align the conflicting restart settings."
+    ],
+    "cannotSee": "A ring with user targeting, an unread or mixed group, or an assignment filter is omitted because its effective device reach is unknown. Quality and feature deadlines are compared separately, and unconfigured values are not treated as conflicting choices. The check skips if an exact overlap scan exceeds its bounded work budget."
+  },
+  "related": [
+    "UPD-003",
+    "UPD-008"
+  ]
+}

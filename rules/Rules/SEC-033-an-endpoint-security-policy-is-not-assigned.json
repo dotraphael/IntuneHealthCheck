@@ -1,0 +1,44 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-033",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "An endpoint security policy is not assigned",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies"
+  ],
+  "scope": "Facts.EndpointSecurityPolicies",
+  "when": "!it.Assignments.Any()",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} endpoint security {Plural(Items.Count, 'policy is', 'policies are')} not assigned",
+    "columns": {
+      "Policy": "it.Name",
+      "Protects": "it.Category",
+      "Modified": "it.LastModified:d"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The control was configured and never switched on. It reaches no device, so it protects nobody, while the console shows it as present and everyone assumes it is working.",
+    "remediation": [
+      "Assign each policy listed to the devices it is meant to protect, or delete it if it was superseded."
+    ],
+    "cannotSee": "Whether a policy is assigned is read, not whether the assignment reaches anything. A policy assigned only to an empty group counts as assigned here and is reported by the targeting hygiene rules instead."
+  },
+  "related": [
+    "SEC-001",
+    "SEC-006",
+    "SEC-012",
+    "SEC-015",
+    "SEC-021"
+  ]
+}

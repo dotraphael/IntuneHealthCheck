@@ -1,0 +1,69 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-008",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "UPD",
+  "title": "Update ring deadline or grace period is too permissive",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "UpdateRings",
+    "Devices"
+  ],
+  "scope": "Facts.UpdateRings",
+  "where": "!it.IsAutopatchManaged",
+  "when": "(it.DeadlineDays == null && it.InstallsAndRestartsAutomatically != true) || it.DeadlineDays > params.maxDeadlineDays || it.GraceDays > params.maxGraceDays",
+  "params": {
+    "maxDeadlineDays": {
+      "default": 7,
+      "range": [
+        0,
+        30
+      ],
+      "text": "Days allowed before installation is enforced"
+    },
+    "maxGraceDays": {
+      "default": 2,
+      "range": [
+        0,
+        7
+      ],
+      "text": "Days allowed after the deadline before a forced restart"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} update {Plural(Items.Count, 'ring enforces', 'rings enforce')} updates too slowly",
+    "columns": {
+      "Ring": "it.Name",
+      "Deadline days": "it.DeadlineDays",
+      "Grace days": "it.GraceDays",
+      "Installs": "it.AutomaticUpdateMode",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Security updates can sit uninstalled for weeks after release, extending the window in which known vulnerabilities are exploitable on those devices.",
+    "technicalDetail": "Without a deadline the user decides when an update installs, and many will keep deferring.",
+    "remediation": [
+      "Set the quality update deadline between three and seven days and the grace period to two.",
+      "Keep automatic restart outside active hours, and check the active hours window is twelve hours or less."
+    ],
+    "cannotSee": "A ring that installs updates and restarts on its own is passed over where it sets no deadline, because the deadline exists to force an install a user keeps putting off and such a ring never offers them the choice. What the device does with an unset deadline under any other mode is Windows's own default, which this tool cannot see. Rings Windows Autopatch created are passed over, because their deadlines are Autopatch's to set."
+  },
+  "frameworks": [
+    "CE:security-update-management"
+  ],
+  "related": [
+    "UPD-007",
+    "UPD-016"
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "TEN-006",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "TEN",
+  "title": "Compliance status validity period is longer than recommended",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Tenant.SettingsKnown",
+  "requires": [
+    "Tenant"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.Tenant.ComplianceCheckinThresholdDays > params.maxDays",
+  "params": {
+    "maxDays": {
+      "default": 30,
+      "range": [
+        1,
+        120
+      ],
+      "text": "Days a device may go without reporting before it is marked non-compliant"
+    }
+  },
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A device that stopped reporting keeps its compliant status, and its access, for {Facts.Tenant.ComplianceCheckinThresholdDays} days. A laptop lost or stolen today would retain access for most of that period.",
+    "remediation": [
+      "Reduce the compliance status validity period to 30 days or fewer.",
+      "Pair it with a stale device cleanup rule so silent devices are removed rather than left in place."
+    ],
+    "cannotSee": "The period is read as configured. How many devices are actually stale, and so how much of the estate the period is currently protecting, is not visible from it."
+  },
+  "related": [
+    "TEN-012",
+    "HYG-001"
+  ]
+}

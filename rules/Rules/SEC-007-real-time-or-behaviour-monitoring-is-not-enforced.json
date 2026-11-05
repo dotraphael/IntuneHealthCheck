@@ -1,0 +1,48 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-007",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "Real-time or behaviour monitoring is not enforced",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles",
+    "Baselines"
+  ],
+  "scope": "Facts.Derived.DefenderPolicies",
+  "when": "it.RealTimeProtection == false || it.BehaviourMonitoring == false",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} antivirus {Plural(Items.Count, 'policy does', 'policies do')} not enforce real-time protection",
+    "columns": {
+      "Policy": "it.Name",
+      "Set in": "it.ObjectType",
+      "Real time": "it.RealTimeProtection",
+      "Behaviour": "it.BehaviourMonitoring",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Malware is detected only during a scheduled scan, by which time it has run. Real-time protection is the difference between prevention and forensics.",
+    "remediation": [
+      "Enable real-time protection and behaviour monitoring in each policy listed."
+    ],
+    "cannotSee": "What the object asks for is read, not what Defender is doing on a device. A device where another product has taken over real-time scanning, or where somebody with local rights turned it off, is not visible here, and neither is a device the policy has not reached yet. A Defender setting is read wherever it sits, whether that is an endpoint security policy, a security baseline or a Settings Catalog profile, and the report names which. An object that says nothing about a setting is not reported for it, because saying nothing and switching it off are different things and only the second is a finding."
+  },
+  "frameworks": [
+    "CE:malware-protection"
+  ],
+  "related": [
+    "SEC-006"
+  ]
+}

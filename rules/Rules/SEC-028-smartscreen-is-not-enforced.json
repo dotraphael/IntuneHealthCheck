@@ -1,0 +1,36 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-028",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SEC",
+  "title": "SmartScreen is not enforced",
+  "type": "Misconfiguration",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Devices.WindowsCount > 0 && Facts.Derived.SecuritySettings.CanJudge('SmartScreen')",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.Derived.SecuritySettings.IsEnforced('SmartScreen')",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Users can download and run files that Windows and Edge would otherwise have warned them about, and can click past the warnings that do appear.",
+    "remediation": [
+      "Enforce SmartScreen for Windows and for Edge, and prevent users from bypassing the warnings."
+    ],
+    "cannotSee": "Whether an assigned policy switches SmartScreen on is read, not whether it is doing anything: it protects against sites and downloads Microsoft has already judged, and says nothing about the rest. The browser has its own setting, so a tenant enforcing it in Edge and not through Windows is protected in the place it matters most and is reported here anyway. A setting this tool has no mapping for is not looked for at all and the rule is then not applicable rather than raised."
+  },
+  "frameworks": [
+    "CE:malware-protection"
+  ]
+}

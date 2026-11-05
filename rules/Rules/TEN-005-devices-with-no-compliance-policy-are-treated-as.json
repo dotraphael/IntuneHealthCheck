@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "TEN-005",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "TEN",
+  "title": "Devices with no compliance policy are treated as compliant",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Tenant.SettingsKnown",
+  "requires": [
+    "Tenant"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.Tenant.SecureByDefault",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Any device that no compliance policy reaches is reported as compliant and keeps access to company data. A gap in targeting becomes an invisible exemption rather than a visible failure.",
+    "technicalDetail": "The setting is Mark devices with no compliance policy assigned as, under Compliance policy settings.",
+    "remediation": [
+      "Set the value to Not compliant.",
+      "Before changing it, confirm every intended device is targeted by a compliance policy, or the change will block users."
+    ],
+    "cannotSee": "Only the tenant-wide setting is read. Which devices no compliance policy reaches is a question of assignment coverage rather than of this setting."
+  },
+  "frameworks": [
+    "CE:secure-configuration"
+  ],
+  "related": [
+    "CMP-014"
+  ]
+}

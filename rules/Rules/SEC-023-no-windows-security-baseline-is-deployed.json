@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-023",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "No Windows security baseline is deployed",
+  "type": "MissingCapability",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Medium",
+  "applies": "Facts.Devices.WindowsCount > 0",
+  "requires": [
+    "Baselines",
+    "LegacyIntents",
+    "LegacyTemplates"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.Baselines.Any(b => b.Product == 'Windows' && b.Assignments.Any()) && !Facts.LegacyIntents.Any(b => b.BaselineProduct == 'Windows' && b.IsAssigned)",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Hundreds of hardening settings that Microsoft has already tested together are not applied, so the estate's security configuration is only as complete as what someone remembered to set.",
+    "remediation": [
+      "Deploy the Windows security baseline to a pilot group, review the conflicts it reports, then widen.",
+      "Expect it to overlap existing profiles; resolve by removing settings from the profiles rather than the baseline."
+    ],
+    "cannotSee": "Whether a baseline is assigned is read, not whether its settings are followed. Settings Catalog baselines and classified legacy intents are both counted; the legacy template type and isAssigned flag establish the latter, but their settings and assignment targets are not read. If legacy intents or templates cannot be read or classified, this absence check is skipped. An organisation that wrote its own hardening instead of using a baseline is still reported."
+  },
+  "frameworks": [
+    "CE:secure-configuration"
+  ],
+  "related": [
+    "SEC-024",
+    "SEC-026"
+  ]
+}

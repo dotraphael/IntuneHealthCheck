@@ -1,0 +1,46 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-011",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "UPD",
+  "title": "Feature update policy targets a version past end of service",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "FeatureUpdatePolicies",
+    "WindowsBuilds"
+  ],
+  "scope": "Facts.FeatureUpdatePolicies",
+  "when": "it.EndOfSupport != null ? it.EndOfSupport < Now : !Ref.WindowsBuilds.IsSupported(it.TargetVersion)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} feature update {Plural(Items.Count, 'policy targets', 'policies target')} an unsupported version",
+    "columns": {
+      "Policy": "it.Name",
+      "Target version": "it.TargetVersion",
+      "Devices": "it.TargetedDeviceCount",
+      "Support ends": "it.EndOfSupport"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The policy is actively holding devices on a build that no longer receives security updates, so it has turned from a control into a risk.",
+    "remediation": [
+      "Update the target version to a build still in support and let the devices move."
+    ],
+    "cannotSee": "Intune says when the targeted build leaves support and that is what this reads. Where the policy carries no such date, the Windows build list published beside the rules decides instead, and that list is as accurate as its last update. With no copy of the list at all the rule is not evaluated, even for a policy that carries its own date."
+  },
+  "frameworks": [
+    "CE:security-update-management"
+  ],
+  "related": [
+    "CMP-004",
+    "DEV-006"
+  ]
+}

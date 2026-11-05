@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "TEN-001",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "TEN",
+  "title": "Multi-admin approval is not configured for any operation",
+  "type": "MissingCapability",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Medium",
+  "requires": [
+    "ApprovalPolicies"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.ApprovalPolicies.Any(p => p.Enabled)",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A single compromised or mistaken administrator account can push a policy, script or application to the whole estate with nothing standing in the way. Multi-admin approval is the control that turns that from one action into two.",
+    "technicalDetail": "Access policies under Tenant administration require a second administrator to approve changes to the protected operation before they take effect.",
+    "remediation": [
+      "Create an access policy for Scripts and one for Apps as a starting point, since both can execute code on every device.",
+      "Name an approver group with at least two members who are not the usual policy authors.",
+      "Extend to Device actions and Role assignments once the process is established."
+    ],
+    "cannotSee": "Intune offers no switch on an access policy, so a policy counts as in force when it names an approver group."
+  },
+  "frameworks": [
+    "CE:secure-configuration"
+  ],
+  "related": [
+    "TEN-002"
+  ]
+}

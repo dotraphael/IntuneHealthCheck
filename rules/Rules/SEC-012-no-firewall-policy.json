@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-012",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "No firewall policy",
+  "type": "MissingCapability",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Devices.WindowsCount > 0",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "LegacyIntents",
+    "LegacyTemplates"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.EndpointSecurityPolicies.Any(p => p.Category == 'Firewall') && !Facts.LegacyIntents.Any(p => p.Category == 'Firewall')",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Firewall state is whatever each device inherited, so laptops on hotel and home networks may be accepting inbound connections with nothing centrally deciding otherwise.",
+    "remediation": [
+      "Create a firewall policy enabling the firewall on domain, private and public profiles."
+    ],
+    "cannotSee": "Settings Catalog policies and classified legacy intents are checked for existence, not whether they work. A legacy intent is classified from its template subtype; its settings and assignment targets are not read. SEC-033 checks assignment only for Settings Catalog policies. If legacy intents or their templates cannot be read or classified, this absence check is skipped."
+  },
+  "frameworks": [
+    "CE:firewalls"
+  ],
+  "related": [
+    "SEC-013",
+    "SEC-014",
+    "SEC-033"
+  ]
+}

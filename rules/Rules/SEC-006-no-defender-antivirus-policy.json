@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-006",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "No Defender antivirus policy",
+  "type": "MissingCapability",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Devices.WindowsCount > 0",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "LegacyIntents",
+    "LegacyTemplates"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.EndpointSecurityPolicies.Any(p => p.Category == 'Antivirus') && !Facts.LegacyIntents.Any(p => p.Category == 'Antivirus')",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Antivirus settings are left at whatever each device happens to have, so protection cannot be assured, reported on, or defended in an audit.",
+    "remediation": [
+      "Create a Microsoft Defender Antivirus policy under Endpoint security and assign it to all Windows devices."
+    ],
+    "cannotSee": "Settings Catalog policies and classified legacy intents are checked for existence, not whether they work. A legacy intent is classified from its template subtype; its settings and assignment targets are not read. SEC-033 checks assignment only for Settings Catalog policies. If legacy intents or their templates cannot be read or classified, this absence check is skipped."
+  },
+  "frameworks": [
+    "CE:malware-protection"
+  ],
+  "related": [
+    "SEC-007",
+    "SEC-009",
+    "SEC-033"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-020",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 3,
+  "domain": "UPD",
+  "title": "Hotpatching is available but not enabled",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "Medium",
+  "effort": "Small",
+  "applies": "Facts.Devices.HotpatchEligibleCount > 0",
+  "requires": [
+    "QualityUpdatePolicies",
+    "Devices"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.QualityUpdatePolicies.Any(p => p.HotpatchEnabled == true && p.Assignments.Any())",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Eligible devices are restarting for updates that could have been applied without a restart, which costs user time every month for no benefit.",
+    "remediation": [
+      "Enable hotpatch on the rings covering eligible devices."
+    ],
+    "cannotSee": "Eligibility is inferred from the build a device reported, which is Windows 11 24H2 or later. Edition and processor architecture decide it too and neither is read, so this counts the devices that could be eligible rather than the ones that are. Hotpatching is switched on in a quality update policy rather than in a ring, and a tenant whose policies could not be read is not reported."
+  }
+}

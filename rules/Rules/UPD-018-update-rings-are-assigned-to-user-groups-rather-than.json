@@ -1,0 +1,37 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-018",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "UPD",
+  "title": "Update rings are assigned to user groups rather than device groups",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "UpdateRings",
+    "Groups"
+  ],
+  "scope": "Facts.UpdateRings",
+  "when": "it.Assignments.Any(a => a.TargetType == 'AllUsers') || it.Assignments.Any(a => Facts.Groups.Any(g => g.Id == a.GroupId && g.MembersKnown && g.MemberCount > 0 && g.DeviceMemberCount == 0))",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} update {Plural(Items.Count, 'ring is', 'rings are')} targeted at users",
+    "columns": {
+      "Ring": "it.Name",
+      "Assigned to": "it.AssignmentSummary"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Update behaviour follows the person rather than the machine, so a shared or unattended device may follow whichever schedule its last user brought with them.",
+    "remediation": [
+      "Retarget update rings to device groups."
+    ],
+    "cannotSee": "Whether a group holds users or devices is worked out from the members that were read: a group with members, none of which is a device, is taken to be a user group. A group whose membership could not be read is not judged, and neither is an empty one, since an empty group says nothing about what it was meant to hold."
+  }
+}

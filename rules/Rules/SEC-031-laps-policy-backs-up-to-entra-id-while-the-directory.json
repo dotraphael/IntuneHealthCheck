@@ -1,0 +1,35 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-031",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "LAPS policy backs up to Entra ID while the directory setting is disabled",
+  "type": "OperationalFailure",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "EntraDeviceSettings"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.EntraDeviceSettings.LapsEnabled && Facts.EndpointSecurityPolicies.Any(p => p.ConfiguresLaps && p.LapsBackupDirectory == 'AzureAD' && p.Assignments.Any())",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The policy is deployed and appears healthy, but the passwords are not being stored anywhere. Nothing in the Intune console says so, and the failure is only discovered when a password is needed.",
+    "remediation": [
+      "Enable Local Administrator Password Solution in the Entra ID device settings, then confirm passwords begin to appear against devices."
+    ]
+  },
+  "related": [
+    "SEC-019",
+    "SEC-030"
+  ]
+}

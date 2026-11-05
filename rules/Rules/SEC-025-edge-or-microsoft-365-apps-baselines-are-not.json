@@ -1,0 +1,37 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-025",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SEC",
+  "title": "Edge or Microsoft 365 Apps baselines are not deployed",
+  "type": "MissingCapability",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Devices.WindowsCount > 0",
+  "requires": [
+    "Baselines",
+    "LegacyIntents",
+    "LegacyTemplates"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.Baselines.Any(b => (b.Product == 'Edge' || b.Product == 'Microsoft365Apps') && b.Assignments.Any()) && !Facts.LegacyIntents.Any(b => (b.BaselineProduct == 'Edge' || b.BaselineProduct == 'Microsoft365Apps') && b.IsAssigned)",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The browser and the office suite are where most users meet the outside world, and both ship hardening baselines that are not being used.",
+    "remediation": [
+      "Deploy the Microsoft Edge baseline and the Microsoft 365 Apps for Enterprise baseline, piloting each first."
+    ],
+    "cannotSee": "Whether the products are in use is not read. An organisation that does not deploy Edge or Microsoft 365 Apps has nothing to harden and is reported here all the same. Settings Catalog baselines and classified, assigned legacy intents are counted, but the legacy settings and assignment targets are not read. If legacy intents or templates cannot be read or classified, this absence check is skipped. Settings applied through a configuration profile instead of a baseline are not counted."
+  },
+  "related": [
+    "SEC-023"
+  ]
+}

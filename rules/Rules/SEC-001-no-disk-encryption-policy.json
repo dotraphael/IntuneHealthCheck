@@ -1,0 +1,47 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-001",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "No disk encryption policy",
+  "type": "MissingCapability",
+  "severity": "Critical",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Devices.WindowsCount > 0",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles",
+    "Baselines",
+    "LegacyIntents",
+    "LegacyTemplates"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.EndpointSecurityPolicies.Any(p => p.Category == 'DiskEncryption') && !Facts.LegacyIntents.Any(p => p.Category == 'DiskEncryption') && !Facts.Derived.EncryptionPolicies.Any(p => p.RequireDeviceEncryption == true) && !Facts.ConfigurationProfiles.Any(p => p.OmaSettings.Any(o => MatchName(o.Uri, '*/BitLocker/RequireDeviceEncryption')))",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Nothing is configuring BitLocker. Whether a device is encrypted depends on how it was built, so a lost laptop may or may not be a reportable data breach and nobody can say which.",
+    "remediation": [
+      "Create a BitLocker policy under Endpoint security, Disk encryption.",
+      "Enable silent encryption and escrow recovery keys to Entra ID.",
+      "Assign to all Windows devices."
+    ],
+    "cannotSee": "An endpoint security disk encryption policy or a classified legacy intent counts by existing, and so does a Settings Catalog profile, a security baseline or an Endpoint Protection template profile that requires device encryption, or a custom profile naming the RequireDeviceEncryption OMA-URI, whose value is not read. Whether any of them is assigned or works is not checked here; SEC-033 checks assignment for endpoint security policies. A legacy intent is classified from its template subtype; its settings and assignment targets are not read. If legacy intents or their templates cannot be read or classified, this absence check is skipped."
+  },
+  "frameworks": [
+    "CE:secure-configuration"
+  ],
+  "related": [
+    "SEC-002",
+    "SEC-003",
+    "CMP-003",
+    "SEC-033"
+  ]
+}

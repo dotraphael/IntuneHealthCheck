@@ -1,0 +1,52 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "TEN-011",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "TEN",
+  "title": "Approval policy has an unusually large number of approvers",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "ApprovalPolicies",
+    "Groups"
+  ],
+  "scope": "Facts.ApprovalPolicies",
+  "where": "it.Enabled && it.ApproversKnown",
+  "when": "it.ApproverCount > params.maxApprovers",
+  "params": {
+    "maxApprovers": {
+      "default": 5,
+      "range": [
+        2,
+        50
+      ],
+      "text": "Approvers above which the control loses meaning"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} approval {Plural(Items.Count, 'policy has', 'policies have')} more than {params.maxApprovers} approvers",
+    "columns": {
+      "Policy": "it.Name",
+      "Operation": "it.Operation",
+      "Approvers": "it.ApproverCount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "When most administrators can approve, approval becomes a formality rather than a check, and accountability for a change becomes hard to establish.",
+    "remediation": [
+      "Reduce the approver group to a small number of people who are accountable for the operation."
+    ],
+    "cannotSee": "A policy whose approver groups could not be read is passed over rather than counted as having none."
+  },
+  "related": [
+    "TEN-003"
+  ]
+}

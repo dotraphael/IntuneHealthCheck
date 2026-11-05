@@ -1,0 +1,34 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "TEN-007",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "TEN",
+  "title": "Autopatch is available but the tenant is not enrolled",
+  "type": "MissingCapability",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Medium",
+  "applies": "Facts.Tenant.HasAutopatchEntitlement",
+  "requires": [
+    "Tenant",
+    "UpdateRings"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.Tenant.AutopatchEnrolled",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A capability already paid for is going unused, leaving update management as manual work that has to be maintained by hand.",
+    "remediation": [
+      "Review Windows Autopatch readiness under Tenant administration.",
+      "Migrate rings gradually rather than all at once."
+    ],
+    "cannotSee": "Entitlement is inferred from the tenant's subscribed licences, so a licence held but not assigned still counts, and enrolment is inferred from the update rings Autopatch creates, so a tenant enrolled but with no rings yet reads as not enrolled."
+  }
+}

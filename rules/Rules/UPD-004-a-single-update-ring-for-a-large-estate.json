@@ -1,0 +1,47 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-004",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "UPD",
+  "title": "A single update ring for a large estate",
+  "type": "BestPractice",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Medium",
+  "applies": "Facts.Devices.WindowsCount > params.minDevices",
+  "requires": [
+    "UpdateRings",
+    "Devices"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.UpdateRings.Count(r => r.Assignments.Any()) <= 1",
+  "params": {
+    "minDevices": {
+      "default": 200,
+      "range": [
+        10,
+        100000
+      ],
+      "text": "Estate size above which a single ring becomes risky"
+    }
+  },
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Every device takes an update at the same time, so a bad update reaches the whole organisation before anyone has seen it work anywhere.",
+    "remediation": [
+      "Add a pilot ring covering a small representative population, deferred less than the broad ring.",
+      "Include a few devices from each hardware model and each business area."
+    ]
+  },
+  "related": [
+    "UPD-005",
+    "UPD-006"
+  ]
+}

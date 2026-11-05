@@ -1,0 +1,51 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-040",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SEC",
+  "title": "A security baseline has been changed from Microsoft's defaults",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "Medium",
+  "effort": "Medium",
+  "requires": [
+    "Baselines",
+    "BaselineSettingChanges"
+  ],
+  "scope": "Facts.BaselineSettingChanges",
+  "when": "!AnyMatch(params.acceptedSettings, it.Setting) && !AnyMatch(params.acceptedSettings, it.SettingId)",
+  "params": {
+    "acceptedSettings": {
+      "default": [],
+      "text": "Baseline settings changed on purpose, by name or identifier, with * and ? wildcards, which stop being reported"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} baseline {Plural(Items.Count, 'setting differs', 'settings differ')} from Microsoft's defaults",
+    "columns": {
+      "Baseline": "it.Baseline",
+      "Setting": "it.Setting",
+      "Microsoft default": "it.Default",
+      "Configured": "it.Configured"
+    },
+    "exposure": "Share(Facts.Baselines.Where(b => Items.Any(i => i.BaselineId == b.Id)).Sum(b => b.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 100
+  },
+  "messages": {
+    "businessImpact": "Each setting in a baseline is the posture Microsoft's security teams recommend. A setting changed or taken out leaves devices less protected than the baseline's name suggests, unless someone decided it on purpose and can say why.",
+    "technicalDetail": "Each baseline is compared with the defaults of the template it was built from, as Intune holds them. A setting counts as changed when its value differs from the template's default, or when the template configures it and the baseline does not. A setting beneath one that already differs is not listed again.",
+    "remediation": [
+      "Review each setting listed with whoever owns the baseline, and restore Microsoft's default where nobody can say why it was changed.",
+      "For a change made on purpose, record the reason, and add the setting's name or identifier to acceptedSettings in this tenant's overrides so it stops being reported."
+    ],
+    "cannotSee": "Settings the template leaves unset are not judged, so a setting added to a baseline is not reported, and neither are settings that choose several options from a list. Whether a change was deliberate is the tenant's to say, which is what the acceptedSettings override is for. A baseline whose settings or template could not be read is passed over rather than reported as unchanged."
+  },
+  "related": [
+    "SEC-023",
+    "SEC-024"
+  ]
+}

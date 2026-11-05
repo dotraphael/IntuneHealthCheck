@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-015",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "UPD",
+  "title": "Preview or Insider builds are enabled in a production ring",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "UpdateRings"
+  ],
+  "scope": "Facts.UpdateRings",
+  "where": "!Ref.Naming.Matches(it.Name, 'pilot-ring')",
+  "when": "(it.PrereleaseFeatures != null && it.PrereleaseFeatures != 'notAllowed') || it.WindowsInsiderChannel != null",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} production {Plural(Items.Count, 'ring receives', 'rings receive')} pre-release builds",
+    "columns": {
+      "Ring": "it.Name",
+      "Pre-release": "it.PrereleaseFeatures",
+      "Channel": "it.WindowsInsiderChannel",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Production devices are receiving software that Microsoft has not finished testing, which is a self-inflicted source of outages.",
+    "remediation": [
+      "Set pre-release features to none on production rings and keep Insider builds to a dedicated test ring."
+    ],
+    "cannotSee": "A ring that leaves pre-release builds to the device has chosen nothing and is passed over, because Windows has its own default and this tool cannot see what a device did with it. Which rings are pilots is read from their names, against the pilot-ring pattern of the customer's naming convention file where it sets one and a pattern the pack carries otherwise, so a tenant naming its pilot something the pattern does not recognise has that ring judged as production."
+  }
+}

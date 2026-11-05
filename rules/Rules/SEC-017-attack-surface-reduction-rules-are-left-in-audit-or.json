@@ -1,0 +1,53 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-017",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "Attack surface reduction rules are left in audit or warn",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies"
+  ],
+  "scope": "Facts.EndpointSecurityPolicies",
+  "where": "it.Category == 'AttackSurfaceReduction'",
+  "when": "(it.AsrRulesInAudit.Any() || it.AsrRulesInWarn.Any()) && DaysSince(it.LastModified) > params.settledDays",
+  "params": {
+    "settledDays": {
+      "default": 60,
+      "range": [
+        7,
+        365
+      ],
+      "text": "Days after which audit or warn has stopped being a trial"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'policy has', 'policies have')} attack surface reduction rules that only audit or warn",
+    "columns": {
+      "Policy": "it.Name",
+      "In audit": "it.AsrRulesInAudit",
+      "In warn": "it.AsrRulesInWarn",
+      "Modified": "it.LastModified:d"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Rules in audit record what they would have blocked and block nothing, and rules in warn let anyone who clicks past the prompt carry on. Either left in place is a control that exists on paper only.",
+    "remediation": [
+      "Review the audit events for the rules listed, add exclusions for genuine business software, then set them to block."
+    ],
+    "cannotSee": "Only attack surface reduction policies are read, so a rule left in audit or warn by a Settings Catalog profile or a security baseline is not reported. The policy's last change stands in for when the rule was put in audit or warn, so a policy edited for any other reason starts the count again."
+  },
+  "related": [
+    "SEC-015",
+    "SEC-016"
+  ]
+}

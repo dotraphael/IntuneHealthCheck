@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-014",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SEC",
+  "title": "Firewall default inbound action is to allow",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies"
+  ],
+  "scope": "Facts.EndpointSecurityPolicies",
+  "where": "it.Category == 'Firewall'",
+  "when": "it.DefaultInboundAction == 'Allow'",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} firewall {Plural(Items.Count, 'policy allows', 'policies allow')} inbound traffic by default",
+    "columns": {
+      "Policy": "it.Name",
+      "Profiles": "it.ProfilesWithAllowInbound"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Anything not explicitly blocked can reach the device, which inverts how a firewall is meant to work.",
+    "remediation": [
+      "Set the default inbound action to Block and add rules for the traffic that is genuinely needed."
+    ]
+  },
+  "frameworks": [
+    "CE:firewalls"
+  ]
+}

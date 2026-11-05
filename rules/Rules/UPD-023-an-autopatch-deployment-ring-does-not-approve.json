@@ -1,0 +1,47 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-023",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "UPD",
+  "title": "An Autopatch deployment ring does not approve drivers automatically",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Tenant.AutopatchEnrolled && Facts.Derived.Autopatch.ManagesDriverUpdates",
+  "requires": [
+    "Tenant",
+    "UpdateRings",
+    "DriverUpdatePolicies"
+  ],
+  "scope": "Facts.Derived.Autopatch.Rings",
+  "when": "it.DriverApprovalIsAutomatic == false",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Autopatch {Plural(Items.Count, 'ring waits', 'rings wait')} for a driver approval by hand",
+    "columns": {
+      "Ring": "it.RingName",
+      "Approval": "it.DriverApproval",
+      "Deferral days": "it.DriverDeferralDays",
+      "Policy": "it.DriverPolicyName"
+    },
+    "exposure": "1",
+    "maxRows": 10
+  },
+  "messages": {
+    "businessImpact": "Driver and firmware updates wait for somebody to approve them one at a time. In practice nobody does, so devices sit on old firmware, and the fixes that matter most, for storage, power and security hardware, are the ones that go uninstalled.",
+    "technicalDetail": "Each Autopatch deployment ring has its own driver update policy, and the approval choice belongs to the policy rather than to the group. A ring left on manual approval defers nothing: it offers nothing at all until an approval is added.",
+    "remediation": [
+      "Set driver and firmware approvals to automatic on the deployment rings, so each ring receives drivers on its own schedule.",
+      "Keep manual approval only where a ring exists to hold a specific driver back, and review that queue on a named day."
+    ],
+    "cannotSee": "Rings are read from the names of the driver update policies Autopatch creates, so a renamed policy is not matched. How long an approval has been waiting is a separate collection this release does not make, so the finding says the ring waits rather than how much is queued behind it."
+  },
+  "related": [
+    "UPD-014",
+    "UPD-022"
+  ]
+}

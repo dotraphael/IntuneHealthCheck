@@ -1,0 +1,43 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-039",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SEC",
+  "title": "Users can read their own BitLocker recovery keys and nothing rotates them",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Small",
+  "applies": "Facts.DefaultUserPermissions.UsersCanReadOwnBitLockerKeys != null",
+  "requires": [
+    "DefaultUserPermissions",
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles",
+    "Baselines",
+    "LegacyIntents",
+    "LegacyTemplates"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.DefaultUserPermissions.UsersCanReadOwnBitLockerKeys == true && !Facts.Derived.EncryptionPolicies.Any(p => p.IsAssigned && (p.RecoveryPasswordRotation == 'Entra joined' || p.RecoveryPasswordRotation == 'Entra and hybrid joined')) && !Facts.ConfigurationProfiles.Any(p => p.IsAssigned && p.OmaSettings.Any(o => MatchName(o.Uri, '*/BitLocker/ConfigureRecoveryPasswordRotation'))) && !Facts.LegacyIntents.Any(p => p.Category == 'DiskEncryption' && p.IsAssigned)",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Anyone signed in as a user can look up the recovery key of that user's own laptop, and the key is never replaced once it has been read. A stolen laptop and a phished password are then enough to unlock the drive, and a key read once keeps working for as long as the device stays encrypted.",
+    "remediation": [
+      "Switch recovery password rotation on in an assigned disk encryption policy, so a key that has been used is replaced; SEC-032 says how.",
+      "Or, where users should not hold their own keys, set Restrict users from recovering the BitLocker key(s) for their owned devices to Yes under Entra ID, Devices, Device settings, so keys come through the service desk."
+    ],
+    "cannotSee": "The switch is read from the directory's default user permissions, which cover ordinary member users; an administrator role, or a custom role that grants key access, can read keys whatever it says and is not checked here. Rotation is judged exactly as SEC-032 judges it, so an assigned custom OMA-URI profile or older disk encryption policy that might rotate keeps this quiet too. Whether any key has actually been read is in the directory's audit log, which this tool does not read."
+  },
+  "related": [
+    "SEC-032",
+    "SEC-002",
+    "SEC-035"
+  ]
+}

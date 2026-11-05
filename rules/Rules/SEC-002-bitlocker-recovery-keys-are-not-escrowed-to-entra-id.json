@@ -1,0 +1,45 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-002",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "BitLocker recovery keys are not escrowed to Entra ID",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles",
+    "Baselines"
+  ],
+  "scope": "Facts.Derived.EncryptionPolicies",
+  "when": "it.EscrowRecoveryKeyToEntra == false",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} encryption {Plural(Items.Count, 'policy does', 'policies do')} not escrow recovery keys",
+    "columns": {
+      "Policy": "it.Name",
+      "Set in": "it.ObjectType",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "If a device asks for a recovery key, there is no key to give. The machine has to be rebuilt and its data is lost, which is a self-inflicted outage rather than a security event.",
+    "remediation": [
+      "Enable saving recovery information to Entra ID, and require it before encryption starts."
+    ],
+    "cannotSee": "Whether the recovery options block is switched on is read, not which of its parts are. A block that is off cannot escrow anything, which is what this reports; a block that is on is taken to escrow to Entra, so a tenant that switched the block on and the escrow setting inside it off is missed until that inner setting is read. A BitLocker setting is read wherever it sits, whether that is an endpoint security policy, a security baseline or a Settings Catalog profile, and the report names which. An object that says nothing about this setting is not reported for it, because saying nothing and switching it off are different things and only the second is a finding."
+  },
+  "related": [
+    "SEC-001",
+    "SEC-032",
+    "SEC-035"
+  ]
+}

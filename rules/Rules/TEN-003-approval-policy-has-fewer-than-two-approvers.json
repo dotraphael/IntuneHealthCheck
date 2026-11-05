@@ -1,0 +1,50 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "TEN-003",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "TEN",
+  "title": "Approval policy has fewer than two approvers",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "ApprovalPolicies",
+    "Groups"
+  ],
+  "scope": "Facts.ApprovalPolicies",
+  "where": "it.Enabled && it.ApproversKnown",
+  "when": "it.ApproverCount < params.minApprovers",
+  "params": {
+    "minApprovers": {
+      "default": 2,
+      "range": [
+        1,
+        10
+      ],
+      "text": "Approvers required before the control is dependable"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} approval {Plural(Items.Count, 'policy has', 'policies have')} too few approvers",
+    "columns": {
+      "Policy": "it.Name",
+      "Operation": "it.Operation",
+      "Approvers": "it.ApproverCount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "With a single approver, one person's absence blocks every change and one person's account compromise defeats the control entirely.",
+    "remediation": [
+      "Add at least one more member to the approver group for each policy listed.",
+      "Avoid using a group whose only members are the same people who author policies."
+    ],
+    "cannotSee": "A policy whose approver groups could not be read is passed over rather than counted as having none."
+  }
+}

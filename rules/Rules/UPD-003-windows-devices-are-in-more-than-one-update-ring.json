@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-003",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "UPD",
+  "title": "Windows devices are in more than one update ring",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "UpdateRings",
+    "Devices",
+    "Groups"
+  ],
+  "scope": "Facts.Derived.RingCoverage",
+  "when": "it.RingCount > 1",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Windows {Plural(Items.Count, 'device is', 'devices are')} in more than one update ring",
+    "columns": {
+      "Device": "it.DeviceName",
+      "Rings": "it.RingNames"
+    },
+    "exposure": "Share(Items.Count, Facts.Devices.WindowsCount)",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "Which schedule a device follows is decided by policy precedence rather than by intent, so a machine meant to be in the pilot may be patching with the broad population, or the reverse.",
+    "remediation": [
+      "Make the ring groups mutually exclusive, using exclusions on the broad ring for the pilot population."
+    ]
+  },
+  "related": [
+    "UPD-002"
+  ]
+}

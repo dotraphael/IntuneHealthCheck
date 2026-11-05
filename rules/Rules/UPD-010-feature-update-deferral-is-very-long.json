@@ -1,0 +1,50 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "UPD-010",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "UPD",
+  "title": "Feature update deferral is very long",
+  "type": "BestPractice",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "UpdateRings"
+  ],
+  "scope": "Facts.UpdateRings",
+  "where": "!it.IsAutopatchManaged && it.FeatureDeferralDays != null",
+  "when": "it.FeatureDeferralDays > params.maxDeferralDays",
+  "params": {
+    "maxDeferralDays": {
+      "default": 180,
+      "range": [
+        0,
+        365
+      ],
+      "text": "Days a feature update may be deferred"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} update {Plural(Items.Count, 'ring defers', 'rings defer')} feature updates for more than {params.maxDeferralDays} days",
+    "columns": {
+      "Ring": "it.Name",
+      "Deferral": "it.FeatureDeferralDays",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Devices drift towards the end of their build's support, at which point the deferral stops mattering and the update becomes urgent instead of planned.",
+    "remediation": [
+      "Use a feature update policy to control the target version rather than a long deferral."
+    ]
+  },
+  "related": [
+    "UPD-011"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-037",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "Antivirus and attack surface reduction policies reach different devices",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "Devices",
+    "Groups"
+  ],
+  "scope": "Facts.Derived.AntivirusAsrReach",
+  "when": "it.ReachKnown && it.AntivirusReachedCount > 0 && it.AsrReachedCount > 0 && it.SharedCount == 0",
+  "report": {
+    "mode": "aggregate",
+    "title": "Antivirus and attack surface reduction policies reach no Windows device in common",
+    "columns": {
+      "Antivirus policies": "it.AntivirusPolicies",
+      "Devices reached": "it.AntivirusReachedCount",
+      "Attack surface reduction policies": "it.AsrPolicies",
+      "Devices with rules": "it.AsrReachedCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.AntivirusReachedCount + i.AsrReachedCount), Facts.Devices.WindowsCount)",
+    "maxRows": 5
+  },
+  "messages": {
+    "businessImpact": "The estate is split in two: the devices that receive the antivirus settings receive no attack surface reduction rules, and the devices with the rules receive no antivirus settings, so neither has the layered protection the two policies were written to give together.",
+    "technicalDetail": "Compares assigned Windows endpoint security policies: the antivirus family against the attack surface reduction policies that set at least one rule, in block, audit or warn, as SEC-016 and SEC-042 count them; SEC-017 reports rules left in audit or warn. Device control and the other policies of that family carry no rules and are left out.",
+    "remediation": [
+      "Assign the antivirus and the attack surface reduction rule policies to the same device groups, or record why the two populations are meant to differ."
+    ],
+    "cannotSee": "Only endpoint security policies are compared, so antivirus settings or rules delivered through a security baseline or a Settings Catalog profile are not counted. User targeting, unread or mixed group membership and assignment filters leave reach unknown, and the check then stays quiet. A partial overlap is not reported: this asks whether the two populations share any device at all."
+  },
+  "frameworks": [
+    "CE:malware-protection"
+  ],
+  "related": [
+    "SEC-033",
+    "SEC-036"
+  ]
+}

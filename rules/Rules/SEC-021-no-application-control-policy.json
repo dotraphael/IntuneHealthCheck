@@ -1,0 +1,41 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-021",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SEC",
+  "title": "No application control policy",
+  "type": "MissingCapability",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Large",
+  "applies": "Facts.Devices.WindowsCount > 0",
+  "requires": [
+    "EndpointSecurityPolicies"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.EndpointSecurityPolicies.Any(p => (p.Category == 'AppControl' || p.Category == 'AppLocker'))",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Any executable a user can obtain will run. Application control is the difference between an attachment being opened and an attachment being executed.",
+    "remediation": [
+      "Start with App Control for Business in audit mode using the Microsoft-signed base policy.",
+      "Review what audit reports for several weeks before enforcing.",
+      "Treat this as a project rather than a setting."
+    ],
+    "cannotSee": "Whether a Settings Catalog policy exists is read, not whether it works. SEC-033 checks whether one exists but reaches no device. Legacy intents are not counted here: their documented template subtype does not identify application control, so this rule may report absence in an estate with a legacy application control intent."
+  },
+  "frameworks": [
+    "CE:secure-configuration"
+  ],
+  "related": [
+    "SEC-022",
+    "SEC-033"
+  ]
+}

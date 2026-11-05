@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SEC-005",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SEC",
+  "title": "Fixed data drives are not required to be encrypted",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EndpointSecurityPolicies",
+    "ConfigurationProfiles",
+    "Baselines"
+  ],
+  "scope": "Facts.Derived.EncryptionPolicies",
+  "when": "it.RequireFixedDriveEncryption == false",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} encryption {Plural(Items.Count, 'policy leaves', 'policies leave')} secondary drives unencrypted",
+    "columns": {
+      "Policy": "it.Name",
+      "Set in": "it.ObjectType",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The system drive is protected while a second drive, which is often where people keep large working files, is not.",
+    "remediation": [
+      "Require encryption for fixed data drives as well as the operating system drive."
+    ],
+    "cannotSee": "What the object asks for is read, not what any device has on it. A tenant whose devices have no second drive is reported the same as one whose devices are full of them. A BitLocker setting is read wherever it sits, whether that is an endpoint security policy, a security baseline or a Settings Catalog profile, and the report names which. An object that says nothing about this setting is not reported for it, because saying nothing and switching it off are different things and only the second is a finding."
+  }
+}

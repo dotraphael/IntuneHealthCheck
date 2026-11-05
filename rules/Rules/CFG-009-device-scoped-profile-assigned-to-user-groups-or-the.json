@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CFG-009",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CFG",
+  "title": "Device-scoped profile assigned to user groups, or the reverse",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles",
+    "Groups"
+  ],
+  "scope": "Facts.ConfigurationProfiles",
+  "where": "it.Assignments.Any()",
+  "when": "it.ScopeMismatch",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'profile is', 'profiles are')} assigned to the wrong kind of group",
+    "columns": {
+      "Profile": "it.Name",
+      "Scope": "it.SettingScope",
+      "Assigned to": "it.AssignedGroupNames"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Settings that apply to a machine are targeted at people, or the other way round, so the policy applies unpredictably and often not at all.",
+    "remediation": [
+      "Retarget device settings to device groups and user settings to user groups.",
+      "Where a profile contains both, split it."
+    ]
+  }
+}

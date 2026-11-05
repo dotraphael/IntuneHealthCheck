@@ -1,0 +1,37 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-001",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "APP",
+  "title": "Applications with no assignment",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Apps"
+  ],
+  "scope": "Facts.Derived.UnassignedApps",
+  "when": "!it.Assignments.Any()",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'application is', 'applications are')} not assigned",
+    "columns": {
+      "Application": "it.DisplayName",
+      "Type": "it.AppType",
+      "Created": "it.CreatedOn:d"
+    },
+    "exposure": "1",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "Packaging effort that reaches nobody. Each one is either an unfinished deployment or a package somebody believes is available and is not.",
+    "remediation": [
+      "Assign the applications that are still wanted and delete the rest."
+    ],
+    "cannotSee": "An application another package names as an automatically installed dependency is left out, because it reaches devices through that package and an assignment of its own would change nothing. A dependency of the detect kind is not left out: Intune only looks for it, so it still has to arrive some other way. An application whose relationships this run could not read is judged on its assignments alone. The application list is the Windows estate's: iOS, macOS and Android packages are left out of the run entirely, so nothing here counts them."
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CAD-009",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CAD",
+  "title": "No policy blocks legacy authentication",
+  "type": "MissingCapability",
+  "severity": "High",
+  "confidence": "Medium",
+  "effort": "Small",
+  "applies": "Facts.CaPolicies.Any()",
+  "requires": [
+    "CaPolicies"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.CaPolicies.Any(c => c.State == 'enabled' && c.IncludesAllUsers && c.Apps.CoversOffice365 && c.TargetsLegacyClients && c.Platforms.IncludesWindows && c.Grant.Controls.Any())",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25,
+    "table": {
+      "source": "Facts.CaPolicies.Where(c => c.Grant.BlockAccess && c.ClientAppTypes.Any(t => t == 'exchangeActiveSync' || t == 'easSupported' || t == 'other'))",
+      "columns": {
+        "Policy": "it.Name",
+        "State": "it.State",
+        "Applies to": "it.UserScopeSummary",
+        "Client apps": "it.ClientAppTypes"
+      }
+    }
+  },
+  "messages": {
+    "businessImpact": "Mail clients and scripts that sign in with a password alone can still reach company data, and they never meet the multi-factor or compliant device requirement the other policies set, so a stolen password is enough to get in.",
+    "technicalDetail": "A policy counts when it is enabled, targets all users and Office 365 or all cloud apps, covers both Exchange ActiveSync and other clients or every client, does not leave Windows out of its platform condition, and requires any grant control. A legacy client can satisfy none of them, so a policy over every client that requires multi-factor authentication or a compliant device stops it as surely as a block does.",
+    "remediation": [
+      "Create an enabled Conditional Access policy for all users and all cloud apps, with the client apps condition set to Exchange ActiveSync clients and Other clients, that blocks access.",
+      "Run it in report-only first to find anything still signing in that way, and exclude only the emergency access accounts."
+    ],
+    "cannotSee": "A tenant with no Conditional Access policy at all is not judged, because it may rely on security defaults, which this does not read; CAD-001 and CAD-005 report that tenant. Risk, location and device conditions are not weighed, so a policy that blocks legacy clients only outside trusted locations counts. Exchange Online's own retirement of basic authentication is not read, and covers only Exchange."
+  },
+  "frameworks": [
+    "CE:user-access-control"
+  ],
+  "related": [
+    "CAD-001",
+    "CAD-004",
+    "CAD-005"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ACC-006",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ACC",
+  "title": "Intune role assigned to a group with no members",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "IntuneRoleAssignments",
+    "Groups"
+  ],
+  "scope": "Facts.IntuneRoleAssignments",
+  "when": "it.MembersKnown && it.MemberCount == 0",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} role {Plural(Items.Count, 'assignment targets', 'assignments target')} an empty group",
+    "columns": {
+      "Role": "it.RoleName",
+      "Role type": "it.RoleKind",
+      "Group": "it.GroupName"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The assignment does nothing, and it hides whether the delegation it represents was ever completed or has been quietly undone.",
+    "remediation": [
+      "Add the intended members, or remove the assignment."
+    ],
+    "cannotSee": "An assignment whose groups would not answer for their membership. It is left out rather than counted as empty. A role Graph would not name is still listed, with its type shown as not identified."
+  }
+}

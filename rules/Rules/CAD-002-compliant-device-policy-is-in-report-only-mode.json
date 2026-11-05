@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CAD-002",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CAD",
+  "title": "Compliant device policy is in report-only mode",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CaPolicies"
+  ],
+  "scope": "Facts.CaPolicies",
+  "where": "it.Grant.RequireCompliantDevice",
+  "when": "it.State == 'enabledForReportingButNotEnforced'",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} device compliance {Plural(Items.Count, 'policy is', 'policies are')} report-only",
+    "columns": {
+      "Policy": "it.Name",
+      "Applies to": "it.UserScopeSummary",
+      "Created": "it.CreatedOn:d"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The policy records what it would have blocked and blocks nothing. If it has been in this state for a while, the evaluation it was created for has probably finished.",
+    "remediation": [
+      "Review the report-only results, resolve the accounts that would be blocked, then enable the policy."
+    ]
+  },
+  "related": [
+    "CAD-001"
+  ]
+}

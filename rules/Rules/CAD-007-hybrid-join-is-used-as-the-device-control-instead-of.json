@@ -1,0 +1,36 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CAD-007",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CAD",
+  "title": "Hybrid join is used as the device control instead of compliance",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CaPolicies"
+  ],
+  "scope": "Facts.CaPolicies",
+  "where": "it.State == 'enabled'",
+  "when": "it.Grant.RequireHybridJoin && !it.Grant.RequireCompliantDevice",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'policy relies', 'policies rely')} on hybrid join rather than compliance",
+    "columns": {
+      "Policy": "it.Name",
+      "Controls": "it.Grant.Summary"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Hybrid join proves a device is domain joined, not that it is encrypted, patched or protected. It is a statement about membership rather than health.",
+    "remediation": [
+      "Add require device to be marked as compliant, keeping hybrid join if the estate still needs it."
+    ]
+  }
+}

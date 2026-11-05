@@ -1,0 +1,46 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-022",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CMP",
+  "title": "Overlapping compliance policies disagree on BitLocker or Secure Boot",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "CompliancePolicies",
+    "Groups"
+  ],
+  "scope": "Facts.Derived.CompliancePolicyOverlaps",
+  "when": "it.HasConflictingRequirements && (it.DifferingSettings.Any(s => s == 'BitLocker') || it.DifferingSettings.Any(s => s == 'Secure Boot'))",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'overlap disagrees', 'overlaps disagree')} on BitLocker or Secure Boot",
+    "columns": {
+      "Policies": "it.PolicyNames",
+      "Disagree on": "it.DifferingSettings",
+      "Devices": "it.DeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.DeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Two policies over the same devices disagree on whether encryption or Secure Boot is required, so the estate's effective bar depends on evaluation order rather than on an agreed standard.",
+    "remediation": [
+      "Align BitLocker and Secure Boot on every overlapping Windows policy, or stop targeting the same groups with both."
+    ],
+    "cannotSee": "DifferingSettings uses the derived names BitLocker and Secure Boot. Device count is zero when membership was not resolved; the conflict is still reported. Generic overlaps without those two settings remain CMP-012. Settings Catalog compliance is unread."
+  },
+  "frameworks": [
+    "CE:secure-configuration"
+  ],
+  "related": [
+    "CMP-012",
+    "CMP-003",
+    "CMP-006"
+  ]
+}

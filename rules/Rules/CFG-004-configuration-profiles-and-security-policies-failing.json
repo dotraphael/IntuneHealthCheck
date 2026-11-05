@@ -1,0 +1,56 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CFG-004",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CFG",
+  "title": "Configuration profiles and security policies failing on a significant share of devices",
+  "type": "OperationalFailure",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles",
+    "EndpointSecurityPolicies",
+    "Baselines",
+    "Devices"
+  ],
+  "scope": "Facts.Derived.Configurations",
+  "where": "it.StatusKnown && it.TargetedDeviceCount > 0",
+  "when": "Pct(it.ErrorCount, it.TargetedDeviceCount) > params.maxErrorPct",
+  "params": {
+    "maxErrorPct": {
+      "default": 5,
+      "range": [
+        0,
+        100
+      ],
+      "text": "Share of targeted devices in error before the profile is treated as failing"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} configuration {Plural(Items.Count, 'policy is', 'policies are')} failing on more than {params.maxErrorPct}% of their devices",
+    "columns": {
+      "Policy": "it.Name",
+      "Errors": "it.ErrorCount",
+      "Targeted": "it.TargetedDeviceCount",
+      "Failure rate": "Pct(it.ErrorCount, it.TargetedDeviceCount)"
+    },
+    "exposure": "Share(Items.Sum(i => i.ErrorCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The configuration is not arriving. Whatever protection or behaviour it was meant to provide is absent on those devices, while the console still shows the policy as deployed.",
+    "remediation": [
+      "Open the per-setting status for each profile and find the setting that fails.",
+      "Common causes are a setting unsupported on the device's edition or build, and a value that conflicts with another policy."
+    ],
+    "cannotSee": "Only a policy whose device status this tool could read is judged. The older device configuration profiles carry a status overview of their own; Settings Catalog profiles, endpoint security policies and security baselines are judged from Intune's assignment failures report, which may list only the policies that have failed somewhere, so a policy it leaves out is passed over rather than reported as healthy. Endpoint security policies authored as legacy intents are not read from it. A device counted under more than one user can be counted more than once, as the console counts it."
+  },
+  "related": [
+    "CFG-003"
+  ]
+}

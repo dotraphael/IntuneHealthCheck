@@ -1,0 +1,43 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CAD-008",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CAD",
+  "title": "A privileged role lacks phishing-resistant authentication",
+  "type": "MissingCapability",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Medium",
+  "requires": [
+    "CaPolicies",
+    "EntraRoleAssignments",
+    "PrivilegedRoleStrengthCoverage"
+  ],
+  "scope": "Facts.PrivilegedRoleStrengthCoverage",
+  "when": "Ref.Roles.IsPrivileged(it.RoleName) && !it.Covered",
+  "report": {
+    "mode": "aggregate",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "An administrator can satisfy a weaker sign-in challenge with a method that an attacker may be able to phish, even when ordinary multi-factor authentication is required.",
+    "technicalDetail": "Each assigned role counts as covered only when every holder is reached by an enabled policy over all cloud resources and sign-in contexts. The built-in phishing-resistant strength or a custom strength allowing only Windows Hello for Business, FIDO2 and multi-factor certificate methods counts. An OR grant with alternative controls does not require the strength.",
+    "remediation": [
+      "Require the phishing-resistant MFA authentication strength for the affected built-in directory role across all cloud resources.",
+      "Register appropriate methods for administrators and test the policy in report-only mode before enabling it.",
+      "Keep emergency access accounts available under a separately tested recovery procedure."
+    ],
+    "cannotSee": "Group membership behind Conditional Access inclusions or exclusions is not resolved to administrators. A relevant policy with unresolved targeting or strength makes this check unavailable rather than claiming absence. Policies with different application or sign-in limits are not combined to infer full coverage. User-scoped Conditional Access does not assess service principals."
+  },
+  "frameworks": [
+    "CE:user-access-control"
+  ],
+  "related": [
+    "CAD-005",
+    "ACC-004"
+  ]
+}

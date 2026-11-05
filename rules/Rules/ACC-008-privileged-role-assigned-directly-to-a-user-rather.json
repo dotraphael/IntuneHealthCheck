@@ -1,0 +1,36 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ACC-008",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ACC",
+  "title": "Privileged role assigned directly to a user rather than through a group",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EntraRoleAssignments"
+  ],
+  "scope": "Facts.EntraRoleAssignments",
+  "where": "it.AssignmentType == 'Permanent'",
+  "when": "it.PrincipalType == 'User' && Ref.Roles.IsPrivileged(it.RoleName)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} privileged {Plural(Items.Count, 'role is', 'roles are')} assigned directly to a user",
+    "columns": {
+      "Account": "it.PrincipalName",
+      "Role": "it.RoleName"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Direct assignments are easy to grant and easy to forget, so they accumulate and are missed when someone changes role or leaves.",
+    "remediation": [
+      "Assign through role-assignable groups so membership is reviewable in one place."
+    ]
+  }
+}

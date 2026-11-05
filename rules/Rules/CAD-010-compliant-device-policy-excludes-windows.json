@@ -1,0 +1,48 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CAD-010",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CAD",
+  "title": "Compliant device policy excludes Windows",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Devices.WindowsCount > 0",
+  "requires": [
+    "CaPolicies",
+    "Devices"
+  ],
+  "scope": "Facts.CaPolicies",
+  "where": "it.Grant.RequireCompliantDevice && it.State == 'enabled'",
+  "when": "!it.Platforms.IncludesWindows",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} enabled compliant-device {Plural(Items.Count, 'policy excludes', 'policies exclude')} Windows",
+    "columns": {
+      "Policy": "it.Name",
+      "Platforms included": "it.Platforms.Included",
+      "Platforms excluded": "it.Platforms.Excluded",
+      "Applies to": "it.UserScopeSummary"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Compliance is enforced for other platforms while Windows, which is this assessment's estate, can still reach the apps those policies cover without being compliant.",
+    "remediation": [
+      "Include Windows in the device platform condition on each listed policy, or write a separate enabled policy that reaches Windows with Require compliant device."
+    ],
+    "cannotSee": "A policy that names no platform already includes Windows and will not raise. Report-only policies are CAD-002. Whether the policy covers company email and files is CAD-001's question."
+  },
+  "frameworks": [
+    "CE:user-access-control"
+  ],
+  "related": [
+    "CAD-001",
+    "CAD-002"
+  ]
+}

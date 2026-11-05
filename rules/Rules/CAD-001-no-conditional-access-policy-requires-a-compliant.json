@@ -1,0 +1,54 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CAD-001",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CAD",
+  "title": "No Conditional Access policy requires a compliant device for company email and files",
+  "type": "MissingCapability",
+  "severity": "Critical",
+  "confidence": "High",
+  "effort": "Medium",
+  "applies": "Facts.CompliancePolicies.Any(c => c.Platform == 'Windows')",
+  "requires": [
+    "CaPolicies",
+    "CompliancePolicies"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.CaPolicies.Any(c => c.State == 'enabled' && c.Grant.RequireCompliantDevice && c.Grant.RequiresEveryControl && c.Platforms.IncludesWindows && c.Apps.CoversEmailAndFiles)",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25,
+    "table": {
+      "source": "Facts.CaPolicies.Where(c => c.Grant.RequireCompliantDevice)",
+      "columns": {
+        "Policy": "it.Name",
+        "State": "it.State",
+        "Applies to": "it.Apps.Included",
+        "Controls": "it.Grant.Summary",
+        "Why it does not count": "it.State != 'enabled' ? 'not enabled' : !it.Grant.RequiresEveryControl ? 'a compliant device is one of several alternatives' : !it.Platforms.IncludesWindows ? 'does not reach Windows' : !it.Apps.CoversEmailAndFiles ? 'does not cover both company email and files' : 'it does count'"
+      }
+    }
+  },
+  "messages": {
+    "businessImpact": "Compliance is measured but never enforced. A device can fail every check and still reach company email and files, which makes the whole compliance effort advisory.",
+    "technicalDetail": "Compliance without a Conditional Access grant is reporting, not control. A policy counts here on four conditions together: it is enabled, it requires a compliant device without offering an alternative to it, its device platforms reach Windows, and its cloud app target covers both Exchange Online and SharePoint Online. Office 365, All cloud apps, or both services named individually satisfy the application condition. The table lists every policy that asks for a compliant device and names the first of the four it fails.",
+    "remediation": [
+      "Create a policy whose cloud app target is Office 365, or All cloud apps, granting access only on a compliant device. A policy over the admin portals, or over only email or only files, does not satisfy this check however strict it is.",
+      "Set the device platform condition to include Windows.",
+      "Deploy in report-only mode first and review the impact, then enable.",
+      "Exclude emergency access accounts before enabling."
+    ],
+    "cannotSee": "The application check covers company email and files, not every Office 365 service. Microsoft recommends the Office 365 grouping to cover dependencies and related metadata that individually named services may miss. Two separate policies, one over Exchange Online and one over SharePoint Online, are not combined by this rule. User exclusions are read, but this rule does not judge whether the policy reaches enough users; CAD-003 checks unusually large exclusions separately."
+  },
+  "frameworks": [
+    "CE:user-access-control"
+  ],
+  "related": [
+    "CMP-001",
+    "CAD-002"
+  ]
+}

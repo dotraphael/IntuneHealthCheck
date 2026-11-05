@@ -1,0 +1,41 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-014",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "APP",
+  "title": "Conflicting Microsoft 365 Apps deployments",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "Apps",
+    "Groups"
+  ],
+  "scope": "Facts.Derived.OfficeDeployments",
+  "when": "it.HasConflictingOfficeConfig",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'group of devices receives', 'groups of devices receive')} conflicting Microsoft 365 Apps settings",
+    "columns": {
+      "Deployments": "it.DeploymentNames",
+      "Conflict": "it.ConflictSummary",
+      "Devices": "it.DeviceCount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Devices receive different channels or architectures depending on order, which produces installation failures that are hard to reproduce.",
+    "remediation": [
+      "Keep one Microsoft 365 Apps deployment per population, with channel and architecture set consistently."
+    ],
+    "cannotSee": "The two deployments are matched on the devices they reach, so an application assigned through a group whose members this run could not read is not judged. Only the servicing channel is compared: the rest of a Microsoft 365 Apps configuration, the applications included and the languages among them, is not read."
+  },
+  "related": [
+    "APP-013"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-011",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "APP",
+  "title": "Applications are offered as available while Company Portal is not deployed",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "Apps"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.Apps.Any(a => a.HasAvailableAssignment) && !Facts.Apps.Any(a => a.IsCompanyPortal && a.HasRequiredAssignment)",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Users have nowhere to obtain the software offered to them, so self-service installs become service desk calls.",
+    "remediation": [
+      "Deploy Company Portal as a required application to all users, or remove the available assignments."
+    ],
+    "cannotSee": "The Company Portal is recognised by its Microsoft Store identifier, or by the name Microsoft publishes it under where the application has none, so a renamed copy packaged some other way reads as not having one. Whether the Windows devices in question can reach the store at all is outside what this tool sees."
+  }
+}

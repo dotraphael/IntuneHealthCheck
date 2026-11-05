@@ -1,0 +1,55 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CFG-016",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CFG",
+  "title": "Device configuration assigned to All Users on a large Windows estate",
+  "type": "BestPractice",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Small",
+  "applies": "Facts.Devices.WindowsCount > params.minWindowsDevices",
+  "requires": [
+    "ConfigurationProfiles",
+    "Devices"
+  ],
+  "scope": "Facts.ConfigurationProfiles",
+  "where": "it.Assignments.Any()",
+  "when": "it.Assignments.Any(a => a.IsAllUsers && !a.IsExclusion && a.FilterId == null)",
+  "params": {
+    "minWindowsDevices": {
+      "default": 50,
+      "range": [
+        10,
+        5000
+      ],
+      "text": "Windows devices above which All Users configuration without a filter is worth reporting"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} configuration {Plural(Items.Count, 'profile targets', 'profiles target')} All Users without a filter",
+    "columns": {
+      "Profile": "it.Name",
+      "Platform": "it.Platform",
+      "Assigned to": "it.AssignmentSummary"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "User-scoped configuration without a filter lands on every user context in a large estate, which is usually broader than the setting was designed for and hard to roll back.",
+    "remediation": [
+      "Prefer device groups for device settings, or add an include filter that limits the All Users assignment."
+    ],
+    "cannotSee": "Endpoint security policies and update rings are not in this scope. Mixed user and device targeting is HYG-008. Whether the profile's settings are themselves user-scoped is CFG-009."
+  },
+  "related": [
+    "CFG-009",
+    "HYG-007",
+    "HYG-008"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CFG-014",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CFG",
+  "title": "Profile targets an assignment filter that matches nothing",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles",
+    "Filters",
+    "FilterEvaluations"
+  ],
+  "scope": "Facts.ConfigurationProfiles",
+  "when": "it.Assignments.Any(a => a.Included && a.FilterMode == 'include' && a.FilterId != null && Facts.Filters.Any(f => f.Id == a.FilterId && f.MatchedCountKnown && f.MatchedDeviceCount == 0))",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'profile uses', 'profiles use')} a filter that matches no device",
+    "columns": {
+      "Profile": "it.Name",
+      "Filter": "it.Assignments.Where(a => a.Included && a.FilterMode == 'include' && a.FilterId != null && Facts.Filters.Any(f => f.Id == a.FilterId && f.MatchedCountKnown && f.MatchedDeviceCount == 0)).Select(a => a.FilterName)"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The included filter narrows this assignment to no device, so it appears deployed but reaches nobody through that assignment.",
+    "remediation": [
+      "Check the filter rule against the device properties it references, since a renamed or empty property matches nothing."
+    ],
+    "cannotSee": "The evaluation counts tenant-wide filter matches, not whether devices in the assignment target group match. A zero tenant-wide count proves this assignment reaches no device; a positive count does not prove that it reaches one."
+  },
+  "related": [
+    "HYG-004"
+  ]
+}

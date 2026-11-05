@@ -1,0 +1,44 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ACC-012",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ACC",
+  "title": "Custom Intune role is not assigned to anyone",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "IntuneRoleDefinitions",
+    "IntuneRoleAssignments"
+  ],
+  "scope": "Facts.IntuneRoleDefinitions",
+  "where": "it.IsCustom",
+  "when": "!Facts.IntuneRoleAssignments.Any(a => a.RoleDefinitionId == it.Id)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} custom {Plural(Items.Count, 'role is', 'roles are')} assigned to nobody",
+    "columns": {
+      "Role": "it.Name",
+      "Permissions": "it.Permissions.Count()"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Someone designed a set of permissions and the work stopped there, so whatever delegation it was meant to enable is still being done another way, most likely by people holding more privilege than the role would have given them.",
+    "technicalDetail": "A role definition with no assignment grants nothing. Intune keeps it in the roles list, where it reads as delegation that is in place.",
+    "remediation": [
+      "Assign the role to the group it was written for, or delete it.",
+      "Where the role was written for a team that no longer exists, deleting it is the tidier answer."
+    ],
+    "cannotSee": "Why the role was written, so a role created deliberately ahead of a delegation still to be made is reported alongside one that was abandoned. A run that could not read the assignments reports none of this rather than calling every custom role unassigned."
+  },
+  "related": [
+    "ACC-006",
+    "ACC-011"
+  ]
+}

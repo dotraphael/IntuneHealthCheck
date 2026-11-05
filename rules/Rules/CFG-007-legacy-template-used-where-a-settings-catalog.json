@@ -1,0 +1,41 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CFG-007",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CFG",
+  "title": "Legacy template used where a Settings Catalog equivalent exists",
+  "type": "BestPractice",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Medium",
+  "requires": [
+    "ConfigurationProfiles"
+  ],
+  "scope": "Facts.ConfigurationProfiles",
+  "where": "it.ProfileType == 'Template'",
+  "when": "Ref.SettingsCatalog.HasEquivalent(it.TemplateId)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'profile uses', 'profiles use')} a legacy template with a Settings Catalog equivalent",
+    "columns": {
+      "Profile": "it.Name",
+      "Template": "it.TemplateName",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "1",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "Legacy templates receive no new settings and are gradually being retired, so the estate is being configured through a route that will eventually stop being maintained.",
+    "remediation": [
+      "Recreate each profile in the Settings Catalog, verify on a pilot group, then retire the template.",
+      "Do this one profile at a time; both applying at once is a conflict."
+    ]
+  },
+  "related": [
+    "CFG-008"
+  ]
+}

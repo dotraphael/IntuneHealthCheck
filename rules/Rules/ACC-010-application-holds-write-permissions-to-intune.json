@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ACC-010",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ACC",
+  "title": "Application holds write permissions to Intune",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "ServicePrincipals"
+  ],
+  "scope": "Facts.ServicePrincipals",
+  "when": "it.HasIntuneWritePermission",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'application has', 'applications have')} write access to Intune",
+    "columns": {
+      "Application": "it.DisplayName",
+      "Permissions": "it.IntuneWritePermissions",
+      "Consented": "it.ConsentedOn"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "An application credential can change device policy without a person signing in, and application secrets are frequently stored less carefully than user passwords.",
+    "remediation": [
+      "Review each application and confirm it is still in use and still needs write access.",
+      "Reduce to read-only permissions wherever the application only reports.",
+      "Remove consent for anything unrecognised."
+    ],
+    "cannotSee": "Requires the optional Application.Read.All permission; without it this check is skipped."
+  }
+}

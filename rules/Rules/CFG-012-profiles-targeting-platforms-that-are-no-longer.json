@@ -1,0 +1,36 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CFG-012",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CFG",
+  "title": "Profiles targeting platforms that are no longer supported",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles"
+  ],
+  "scope": "Facts.ConfigurationProfiles",
+  "when": "Ref.Platforms.IsRetired(it.Platform)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'profile targets', 'profiles target')} a retired platform",
+    "columns": {
+      "Profile": "it.Name",
+      "Platform": "it.Platform",
+      "Modified": "it.LastModified:d"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Configuration is being maintained for platforms that no longer exist in the estate, which adds noise to every review and every migration.",
+    "remediation": [
+      "Delete the profiles after confirming no devices of that platform remain."
+    ]
+  }
+}

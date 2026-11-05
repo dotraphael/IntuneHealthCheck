@@ -1,0 +1,47 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-008",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "APP",
+  "title": "No third-party patching mechanism is evident",
+  "type": "MissingCapability",
+  "severity": "Medium",
+  "confidence": "Low",
+  "effort": "Medium",
+  "applies": "Facts.Apps.Any()",
+  "requires": [
+    "Apps"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.Apps.Any(a => Ref.Patterns.AnyMatch(a.DisplayName, 'packager') || Ref.Patterns.AnyMatch(a.Publisher, 'packager') || Ref.Patterns.AnyMatch(a.Description, 'packager') || Ref.Patterns.AnyMatch(a.Notes, 'packager') || Ref.Patterns.AnyMatch(a.Owner, 'packager') || Ref.Patterns.AnyMatch(a.Developer, 'packager') || Ref.Patterns.AnyMatch(a.InformationUrl, 'packager') || a.AppType == 'WinGet' || a.AppType == 'Win32Catalog') && Facts.Apps.Count(a => a.SupersedesCount > 0) < params.supersedenceChains",
+  "params": {
+    "supersedenceChains": {
+      "default": 3,
+      "range": [
+        1,
+        25
+      ],
+      "text": "Applications superseding an earlier version below which the trail is too thin to call it a patching mechanism"
+    }
+  },
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Windows and Microsoft applications are patched while everything else depends on someone remembering to repackage, which in most organisations means it does not happen.",
+    "remediation": [
+      "Adopt a mechanism: the Enterprise App Catalog, a packaging product, or self-updating installers where the vendor supports them.",
+      "Whichever is chosen, decide who owns the monthly cycle."
+    ],
+    "cannotSee": "Inferred from the applications the tenant holds. A packaging product is recognised where it names itself in an application's name, publisher, description, notes, owner, developer or information link, where applications come from the Enterprise App Catalog or winget, which update themselves, or where several applications supersede an earlier version, which is the trail an automated packaging product leaves whether or not it signs its work. A product that names itself nowhere, deploys nothing from a catalogue and builds no supersedence is reported as absent, as is a script on a schedule, and the list of products the pack recognises is reference data rather than something the tool knows. An application whose relationships this run could not read counts towards nothing. The application list is the Windows estate's: iOS, macOS and Android packages are left out of the run entirely, so nothing here counts them."
+  },
+  "related": [
+    "APP-007",
+    "APP-010"
+  ]
+}

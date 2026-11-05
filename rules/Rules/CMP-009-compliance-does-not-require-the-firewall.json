@@ -1,0 +1,44 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-009",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CMP",
+  "title": "Compliance does not require the firewall",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CompliancePolicies"
+  ],
+  "scope": "Facts.CompliancePolicies",
+  "where": "it.Platform == 'Windows'",
+  "when": "it.RequireFirewall == false",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} compliance {Plural(Items.Count, 'policy does', 'policies do')} not require the firewall",
+    "columns": {
+      "Policy": "it.Name",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A device with the firewall disabled keeps access to company resources, including from untrusted networks where the firewall matters most.",
+    "remediation": [
+      "Enable Firewall in each policy listed."
+    ],
+    "cannotSee": "Compliance authored in the Settings Catalog is not read: this tool reads the typed compliance API, so a requirement set in a Settings Catalog compliance policy is invisible here and a tenant that has moved to them is judged only on what it left behind. Whether an unassigned policy is a draft or an oversight is also not visible, and the Assigned to column says which listed policies reach nobody."
+  },
+  "frameworks": [
+    "CE:firewalls"
+  ],
+  "related": [
+    "SEC-012"
+  ]
+}

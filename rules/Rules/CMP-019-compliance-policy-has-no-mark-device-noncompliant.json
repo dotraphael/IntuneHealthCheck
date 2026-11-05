@@ -1,0 +1,48 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-019",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CMP",
+  "title": "Compliance policy has no mark device noncompliant action",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CompliancePolicies"
+  ],
+  "scope": "Facts.CompliancePolicies",
+  "where": "it.Platform == 'Windows' && it.Assignments.Any()",
+  "when": "!it.Actions.Any(a => a.Type == 'block')",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} assigned Windows compliance {Plural(Items.Count, 'policy never marks', 'policies never mark')} a device non-compliant",
+    "columns": {
+      "Policy": "it.Name",
+      "Assigned to": "it.AssignmentSummary",
+      "Actions": "it.Actions.Count()",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Requirements are measured but the device is never marked non-compliant, so Conditional Access that depends on compliance never acts.",
+    "technicalDetail": "Graph names the Mark device noncompliant action as block. Retire and wipe without block still raise here.",
+    "remediation": [
+      "Add a Mark device noncompliant action with a short grace period, and prefer a notification action ahead of it."
+    ],
+    "cannotSee": "Graph names the action block. Retire and wipe without block still raise here. Settings Catalog compliance is unread. An unassigned policy is filtered out by where."
+  },
+  "frameworks": [
+    "CE:secure-configuration"
+  ],
+  "related": [
+    "CMP-010",
+    "CMP-011",
+    "CAD-001"
+  ]
+}

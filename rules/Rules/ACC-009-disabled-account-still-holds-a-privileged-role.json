@@ -1,0 +1,35 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ACC-009",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ACC",
+  "title": "Disabled account still holds a privileged role",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EntraRoleAssignments"
+  ],
+  "scope": "Facts.EntraRoleAssignments",
+  "when": "!it.AccountEnabled && Ref.Roles.IsPrivileged(it.RoleName)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} disabled {Plural(Items.Count, 'account holds', 'accounts hold')} a privileged role",
+    "columns": {
+      "Account": "it.PrincipalName",
+      "Role": "it.RoleName"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A disabled account cannot sign in today, but the rights remain attached, so re-enabling it, by mistake or by an attacker, restores administrative access immediately.",
+    "remediation": [
+      "Remove the role assignment as part of the leavers process rather than relying on the account being disabled."
+    ]
+  }
+}

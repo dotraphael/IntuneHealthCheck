@@ -1,0 +1,37 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ACC-011",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 3,
+  "domain": "ACC",
+  "title": "Custom Intune role duplicates a built-in role",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "IntuneRoleDefinitions"
+  ],
+  "scope": "Facts.Derived.DuplicateIntuneRoles",
+  "when": "true",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} custom {Plural(Items.Count, 'role duplicates', 'roles duplicate')} a built-in role",
+    "columns": {
+      "Custom role": "it.RoleName",
+      "Equivalent": "it.BuiltInName",
+      "Permissions": "it.PermissionCount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Custom roles have to be maintained as Intune adds permissions, while built-in roles are maintained by Microsoft. Duplicating one creates work with no benefit.",
+    "remediation": [
+      "Replace the custom role with the built-in equivalent and delete it."
+    ],
+    "cannotSee": "A tenant whose built-in roles were not read. With nothing to compare against, nothing is claimed rather than every custom role being called original."
+  }
+}

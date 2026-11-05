@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CAD-004",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CAD",
+  "title": "Compliant device is offered as an alternative to multi-factor rather than required",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CaPolicies"
+  ],
+  "scope": "Facts.CaPolicies",
+  "where": "it.State == 'enabled'",
+  "when": "it.Grant.Operator == 'OR' && it.Grant.RequireCompliantDevice && it.Grant.RequireMfa",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'policy accepts', 'policies accept')} either compliance or multi-factor, not both",
+    "columns": {
+      "Policy": "it.Name",
+      "Controls": "it.Grant.Summary"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A user with multi-factor can reach company data from any machine, managed or not, so device health stops being a condition of access.",
+    "remediation": [
+      "Change the grant operator to require all the selected controls.",
+      "Test in report-only first, since this will affect people working from unmanaged machines."
+    ]
+  },
+  "related": [
+    "CAD-001"
+  ]
+}

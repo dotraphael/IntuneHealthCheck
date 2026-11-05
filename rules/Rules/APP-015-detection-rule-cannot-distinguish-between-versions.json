@@ -1,0 +1,38 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-015",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "APP",
+  "title": "Detection rule cannot distinguish between versions",
+  "type": "Misconfiguration",
+  "severity": "Low",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "Apps"
+  ],
+  "scope": "Facts.Apps",
+  "when": "it.AppType == 'Win32' && it.DetectionRules.Any(d => d.Type == 'file' && !d.ChecksVersion)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Win32 {Plural(Items.Count, 'application has', 'applications have')} a version-blind detection rule",
+    "columns": {
+      "Application": "it.DisplayName",
+      "Version": "it.Version"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "An older version already present satisfies the detection, so the update never installs and the console reports success.",
+    "remediation": [
+      "Use a file version or registry version comparison rather than existence alone."
+    ]
+  },
+  "related": [
+    "APP-002"
+  ]
+}

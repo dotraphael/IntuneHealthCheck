@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CFG-008",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CFG",
+  "title": "Custom OMA-URI settings that now have Settings Catalog equivalents",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles"
+  ],
+  "scope": "Facts.ConfigurationProfiles",
+  "where": "it.ProfileType == 'Custom'",
+  "when": "it.OmaSettings.Any(o => Ref.SettingsCatalog.HasOmaEquivalent(o.Uri))",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} custom {Plural(Items.Count, 'profile contains', 'profiles contain')} settings now available in the Settings Catalog",
+    "columns": {
+      "Profile": "it.Name",
+      "Settings": "it.OmaSettings.Count()"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Custom OMA-URI has no validation, no reporting per setting and no protection against a typo, so it is the hardest configuration to support and the easiest to get quietly wrong.",
+    "remediation": [
+      "Replace the settings that now exist in the Settings Catalog and keep custom URIs only for what is genuinely unavailable."
+    ]
+  },
+  "related": [
+    "CFG-007"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-017",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CMP",
+  "title": "Compliance does not use the Defender for Endpoint risk score",
+  "type": "MissingCapability",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Tenant.HasDefenderForEndpoint",
+  "requires": [
+    "CompliancePolicies",
+    "Tenant"
+  ],
+  "scope": "Facts.CompliancePolicies",
+  "where": "it.Platform == 'Windows'",
+  "when": "it.RequireThreatProtection == false",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} compliance {Plural(Items.Count, 'policy ignores', 'policies ignore')} the Defender for Endpoint risk score",
+    "columns": {
+      "Policy": "it.Name",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A device Defender for Endpoint has judged to be at risk, because something on it is behaving like an attack in progress, stays compliant and keeps its access to company data until somebody notices by hand.",
+    "remediation": [
+      "Switch on Require the device to be at or under the machine risk score in the compliance policy, and set it to Medium or stricter.",
+      "Confirm the Intune connector for Defender for Endpoint is switched on first, or every device will report as unknown and the requirement will do nothing."
+    ],
+    "cannotSee": "That the setting is switched off is read, not why. Whether the Intune connector for Defender for Endpoint is switched on is not read, only that the tenant is licensed, so a tenant that has the licence and has never connected the two is reported here as well. Compliance authored in the Settings Catalog is not read at all."
+  },
+  "frameworks": [
+    "CE:malware-protection"
+  ],
+  "related": [
+    "CMP-018",
+    "CMP-008"
+  ]
+}

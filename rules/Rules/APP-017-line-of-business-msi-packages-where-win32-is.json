@@ -1,0 +1,35 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-017",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "APP",
+  "title": "Line of business MSI packages where Win32 is recommended",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Apps"
+  ],
+  "scope": "Facts.Apps",
+  "when": "it.AppType == 'WindowsMobileMSI'",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'application uses', 'applications use')} the line of business MSI type",
+    "columns": {
+      "Application": "it.DisplayName",
+      "Assigned to": "it.AssignmentSummary"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The line of business type has no requirement rules, no detection rules and no dependency support, so troubleshooting a failure has very little to work with.",
+    "remediation": [
+      "Repackage as Win32, which supports detection, requirements, dependencies and supersedence."
+    ]
+  }
+}

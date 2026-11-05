@@ -1,0 +1,35 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CFG-010",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CFG",
+  "title": "The same group is both included and excluded on a profile",
+  "type": "Misconfiguration",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles"
+  ],
+  "scope": "Facts.ConfigurationProfiles",
+  "when": "it.Assignments.Any(a => a.Included) && it.Assignments.Any(a => !a.Included && it.Assignments.Any(b => b.Included && b.GroupId == a.GroupId))",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'profile includes', 'profiles include')} and excludes the same group",
+    "columns": {
+      "Profile": "it.Name",
+      "Group": "it.AssignedGroupNames"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Exclusion wins, so the profile reaches nobody it appears to target. It looks deployed and does nothing.",
+    "remediation": [
+      "Remove either the inclusion or the exclusion so the intent is visible from the assignment alone."
+    ]
+  }
+}

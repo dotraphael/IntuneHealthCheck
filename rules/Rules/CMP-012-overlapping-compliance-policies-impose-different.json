@@ -1,0 +1,41 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-012",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CMP",
+  "title": "Overlapping compliance policies impose different requirements",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "CompliancePolicies",
+    "Groups"
+  ],
+  "scope": "Facts.Derived.CompliancePolicyOverlaps",
+  "when": "it.HasConflictingRequirements",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'group of devices is', 'groups of devices are')} covered by compliance policies that disagree",
+    "columns": {
+      "Policies": "it.PolicyNames",
+      "Differing requirements": "it.DifferingSettings",
+      "Devices": "it.DeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.DeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A device must satisfy every policy that targets it, so the strictest wins, which is often not what the person who wrote the gentler policy expected.",
+    "remediation": [
+      "Consolidate to one baseline policy per platform, with additions only where a group genuinely needs more."
+    ],
+    "cannotSee": "Two policies are compared on the requirements this tool reads, not on every setting they carry, so policies differing only in something unread look identical. Compliance authored in the Settings Catalog is not read at all."
+  },
+  "related": [
+    "CMP-002"
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-019",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "APP",
+  "title": "Required Win32 applications almost never install",
+  "type": "OperationalFailure",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Medium",
+  "requires": [
+    "Apps",
+    "AppInstallStatus"
+  ],
+  "scope": "Facts.Apps",
+  "where": "it.StatusKnown && it.AppType == 'Win32' && it.HasRequiredAssignment && DaysSince(it.CreatedOn) > params.minAgeDays",
+  "when": "it.TargetedDeviceCount - it.NotApplicableCount >= params.minTargets && Pct(it.InstalledCount, it.TargetedDeviceCount - it.NotApplicableCount) < params.minSuccessPct",
+  "params": {
+    "minAgeDays": {
+      "default": 7,
+      "range": [
+        1,
+        60
+      ],
+      "text": "Days after an application is created before its install rate is judged"
+    },
+    "minSuccessPct": {
+      "default": 10,
+      "range": [
+        1,
+        100
+      ],
+      "text": "Share of applicable devices below which a required package has effectively never installed"
+    },
+    "minTargets": {
+      "default": 10,
+      "range": [
+        1,
+        1000
+      ],
+      "text": "Applicable devices before an install rate is worth judging"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} required Win32 {Plural(Items.Count, 'application is', 'applications are')} installed on fewer than {params.minSuccessPct}% of the devices {Plural(Items.Count, 'it applies', 'they apply')} to",
+    "columns": {
+      "Application": "it.DisplayName",
+      "Installed": "it.InstalledCount",
+      "Failed": "it.FailedCount",
+      "Pending": "it.PendingCount",
+      "Applicable": "it.TargetedDeviceCount - it.NotApplicableCount",
+      "Install rate": "Pct(it.InstalledCount, it.TargetedDeviceCount - it.NotApplicableCount)"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount - i.NotApplicableCount - i.InstalledCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Users are meant to have this software and almost nobody does, while the console shows the assignment in place, so the gap goes unnoticed until somebody needs the application and finds it missing.",
+    "technicalDetail": "The rate is installed devices over the devices the application applies to, which is every device the install summary counts less those its requirement rules ruled out.",
+    "remediation": [
+      "Check the detection rule first: one that never matches leaves the package reported as not installed however often it runs.",
+      "Then check the requirement rules, the dependencies and the install context, and whether the devices have checked in since the assignment was made."
+    ],
+    "cannotSee": "Counts come from Intune's install summary report, which can lag the devices by a day; where the report cannot be read this rule is skipped. An application failing on most devices is APP-002's question as well, and one waiting a long time is APP-012's. Applications other than Win32 are not judged, and creation date stands in for assignment date, which Intune does not keep."
+  },
+  "related": [
+    "APP-002",
+    "APP-012",
+    "APP-015"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CFG-015",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CFG",
+  "title": "Included assignment filter matches no device in its target group",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles",
+    "Filters",
+    "FilterGroupEvaluations",
+    "Devices",
+    "Groups"
+  ],
+  "scope": "Facts.FilterGroupEvaluations",
+  "when": "it.HasEmptyAssignedGroupMatch",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} included {Plural(Items.Count, 'filter matches', 'filters match')} no device in a target group",
+    "columns": {
+      "Filter": "it.Name",
+      "Affected assignments": "it.EmptyAssignedGroupMatches",
+      "Tenant matches": "it.MatchedDeviceCount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "An included filter can match devices elsewhere in the tenant yet match none in the group it narrows. The policy then looks assigned but reaches no device through that assignment.",
+    "remediation": [
+      "Compare the filter rule with the device properties in its assigned group.",
+      "Correct the filter rule or group membership where their intersection is empty."
+    ],
+    "cannotSee": "The filter evaluation is tenant-wide. This rule checks only included configuration-profile filters assigned to known device-only groups; user and mixed groups can reach devices through users and are excluded. A filter matching more than 500 devices, an incomplete evaluation, missing managed-device identity or unknown group membership skips this check rather than claiming a clear outcome. It does not limit the intersection to an assessment's device scope."
+  },
+  "related": [
+    "CFG-014",
+    "HYG-013"
+  ]
+}

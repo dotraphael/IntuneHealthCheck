@@ -1,0 +1,48 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CAD-011",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CAD",
+  "title": "Privileged role multi-factor policy is report-only",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CaPolicies"
+  ],
+  "scope": "Facts.CaPolicies",
+  "where": "it.CoversPrivilegedRoles && it.Grant.RequireMfa && it.Grant.RequiresEveryControl",
+  "when": "it.State == 'enabledForReportingButNotEnforced' && !Facts.CaPolicies.Any(c => c.State == 'enabled' && c.CoversPrivilegedRoles && (c.Grant.RequireMfa || c.Grant.RequireAuthenticationStrength) && c.Grant.RequiresEveryControl)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} privileged-role multi-factor {Plural(Items.Count, 'policy is', 'policies are')} report-only",
+    "columns": {
+      "Policy": "it.Name",
+      "Applies to": "it.UserScopeSummary",
+      "Controls": "it.Grant.Summary",
+      "Created": "it.CreatedOn:d"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Administrators look protected in the console while the policy only records what it would have required. A phished administrator password still gets through.",
+    "technicalDetail": "A policy counts when it covers privileged roles the same way CAD-005 does, requires multi-factor authentication, and is left in report-only mode, while no enabled policy requires multi-factor authentication or an authentication strength of the same administrators.",
+    "remediation": [
+      "Review the report-only results for the named roles, resolve the accounts that would be blocked, then set the policy to On."
+    ],
+    "cannotSee": "Phishing-resistant strength is CAD-008. A report-only policy that uses OR with an alternative to MFA is not counted here, because MFA is not mandatory on that policy. A report-only policy kept beside an enforced one, usually to trial something stricter, is left alone."
+  },
+  "frameworks": [
+    "CE:user-access-control"
+  ],
+  "related": [
+    "CAD-005",
+    "CAD-008",
+    "CAD-002"
+  ]
+}

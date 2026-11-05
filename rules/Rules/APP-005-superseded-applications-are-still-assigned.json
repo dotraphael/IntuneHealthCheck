@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-005",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "APP",
+  "title": "Superseded applications are still assigned",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Apps"
+  ],
+  "scope": "Facts.Apps",
+  "when": "it.IsSuperseded && it.Assignments.Any()",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} superseded {Plural(Items.Count, 'application is', 'applications are')} still assigned",
+    "columns": {
+      "Application": "it.DisplayName",
+      "Superseded by": "it.SupersededByName"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Old versions continue to install alongside their replacements, which is how an estate ends up running two versions of the same product.",
+    "remediation": [
+      "Remove the assignments from the superseded packages, keeping the packages themselves for supersedence to work."
+    ],
+    "cannotSee": "Supersedence is read one application at a time, so an application whose relationships this run could not read is not judged. Whether the superseding package has actually replaced the old one on a device is per-device state this release does not collect."
+  },
+  "related": [
+    "APP-004"
+  ]
+}

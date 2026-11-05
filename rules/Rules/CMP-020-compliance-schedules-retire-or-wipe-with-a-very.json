@@ -1,0 +1,56 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-020",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CMP",
+  "title": "Compliance schedules retire or wipe with a very short grace",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CompliancePolicies"
+  ],
+  "scope": "Facts.CompliancePolicies",
+  "where": "it.Platform == 'Windows' && it.Actions.Any(a => a.Type == 'retire' || a.Type == 'wipe')",
+  "when": "it.Actions.Any(a => (a.Type == 'retire' || a.Type == 'wipe') && a.GracePeriodDays < params.minDestructiveGraceDays)",
+  "params": {
+    "minDestructiveGraceDays": {
+      "default": 7,
+      "range": [
+        1,
+        30
+      ],
+      "text": "Minimum days before a retire or wipe action may run"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Windows compliance {Plural(Items.Count, 'policy retires or wipes', 'policies retire or wipe')} sooner than {params.minDestructiveGraceDays} days",
+    "columns": {
+      "Policy": "it.Name",
+      "Shortest destructive grace": "it.Actions.Where(a => a.Type == 'retire' || a.Type == 'wipe').Select(a => a.GracePeriodDays).Min()",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A device that fails a check can be retired or wiped before the user or the service desk has time to recover it, which turns a compliance miss into lost data or a rebuild.",
+    "remediation": [
+      "Lengthen the grace on retire and wipe, and keep Mark device noncompliant as the earlier action Conditional Access can use."
+    ],
+    "cannotSee": "Whether a wipe is selective or full is not distinguished. Notification-only policies do not raise. Settings Catalog compliance is unread."
+  },
+  "frameworks": [
+    "CE:secure-configuration"
+  ],
+  "related": [
+    "CMP-010",
+    "CMP-019"
+  ]
+}

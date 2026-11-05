@@ -1,0 +1,46 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-003",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CMP",
+  "title": "Compliance does not require BitLocker",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CompliancePolicies"
+  ],
+  "scope": "Facts.CompliancePolicies",
+  "where": "it.Platform == 'Windows'",
+  "when": "it.RequireBitLocker == false",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Windows compliance {Plural(Items.Count, 'policy does', 'policies do')} not require BitLocker",
+    "columns": {
+      "Policy": "it.Name",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "An unencrypted laptop that is lost or stolen is a data breach that has to be reported. Compliance is where that becomes enforceable rather than hoped for.",
+    "remediation": [
+      "Enable Require BitLocker in each policy listed.",
+      "Confirm an encryption policy is deployed first, or devices will be marked non-compliant before they can encrypt."
+    ],
+    "cannotSee": "Compliance authored in the Settings Catalog is not read, so a BitLocker requirement set in one is invisible here. Whether the estate is encrypted by other means, such as an encryption policy without a compliance rule behind it, is a separate question SEC-001 asks."
+  },
+  "frameworks": [
+    "CE:secure-configuration"
+  ],
+  "related": [
+    "SEC-001",
+    "DEV-007"
+  ]
+}

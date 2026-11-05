@@ -1,0 +1,35 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-010",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "APP",
+  "title": "The Enterprise App Catalog is licensed but unused",
+  "type": "BestPractice",
+  "severity": "Info",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Tenant.HasIntuneSuite",
+  "requires": [
+    "Apps",
+    "Tenant"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.Apps.Any(a => a.AppType == 'EnterpriseAppCatalog')",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A capability already paid for is unused, and it is the one that would most reduce the packaging effort described elsewhere in this report.",
+    "remediation": [
+      "Move the common third-party applications to catalogue packages, which Microsoft keeps current."
+    ]
+  },
+  "related": [
+    "APP-008"
+  ]
+}

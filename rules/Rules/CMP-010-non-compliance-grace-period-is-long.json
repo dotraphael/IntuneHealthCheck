@@ -1,0 +1,51 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-010",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CMP",
+  "title": "Non-compliance grace period is long",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CompliancePolicies"
+  ],
+  "scope": "Facts.CompliancePolicies",
+  "when": "it.ActionGracePeriodDays > params.maxGraceDays",
+  "params": {
+    "maxGraceDays": {
+      "default": 14,
+      "range": [
+        0,
+        90
+      ],
+      "text": "Days a non-compliant device keeps access before action is taken"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} compliance {Plural(Items.Count, 'policy allows', 'policies allow')} more than {params.maxGraceDays} days before acting",
+    "columns": {
+      "Policy": "it.Name",
+      "Grace period": "it.ActionGracePeriodDays",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A device found unencrypted or unpatched keeps its access for weeks, which is long enough for the exposure the check was meant to close.",
+    "remediation": [
+      "Reduce the grace period to a small number of days.",
+      "Add an earlier action that emails the user, so being marked non-compliant is never the first they hear of it."
+    ],
+    "cannotSee": "The grace period is taken as the longest of the policy's scheduled actions, so a policy that marks a device non-compliant late but warns early is judged on the later one. What happens to a non-compliant device is a Conditional Access question rather than a compliance one, and a tenant whose policies grant access to non-compliant devices anyway is not judged here. Compliance authored in the Settings Catalog is not read at all."
+  },
+  "related": [
+    "CMP-011"
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ACC-007",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ACC",
+  "title": "Intune role assignment is unscoped while scope tags are in use",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.ScopeTags.Count() > 1",
+  "requires": [
+    "IntuneRoleAssignments",
+    "ScopeTags"
+  ],
+  "scope": "Facts.IntuneRoleAssignments",
+  "where": "it.ScopeTagsKnown",
+  "when": "!it.ScopeTagNames.Any(t => t != 'Default')",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} role {Plural(Items.Count, 'assignment is', 'assignments are')} not limited by scope tag",
+    "columns": {
+      "Role": "it.RoleName",
+      "Role type": "it.RoleKind",
+      "Assigned to": "it.GroupName",
+      "Scope tags": "it.ScopeTagNames",
+      "Scope groups": "it.ScopeGroupName"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Scope tags have been created to separate administrative responsibilities, but these assignments see everything, so the separation is not actually in force.",
+    "remediation": [
+      "Apply the appropriate scope tag to each assignment listed.",
+      "Confirm the objects those administrators need also carry the tag, since a tag on one side alone has no effect."
+    ],
+    "cannotSee": "An assignment whose scope tags Graph did not return is passed over rather than called unscoped, and a role Graph would not name is still listed, because an unscoped assignment matters whether or not the role behind it could be read. Scope groups are shown beside the tags because they are a separate limit, but this rule asks only about tags."
+  },
+  "related": [
+    "TEN-009",
+    "HYG-010"
+  ]
+}

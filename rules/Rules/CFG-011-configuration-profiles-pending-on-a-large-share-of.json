@@ -1,0 +1,61 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CFG-011",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CFG",
+  "title": "Configuration profiles pending on a large share of devices",
+  "type": "OperationalFailure",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles",
+    "Devices"
+  ],
+  "scope": "Facts.ConfigurationProfiles",
+  "where": "it.TargetedDeviceCount > 0 && DaysSince(it.LastModified) > params.settledDays",
+  "when": "Pct(it.PendingCount, it.TargetedDeviceCount) > params.maxPendingPct",
+  "params": {
+    "maxPendingPct": {
+      "default": 10,
+      "range": [
+        0,
+        100
+      ],
+      "text": "Share still pending before delivery is treated as stalled"
+    },
+    "settledDays": {
+      "default": 14,
+      "range": [
+        1,
+        90
+      ],
+      "text": "Days after a change before pending stops being normal"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'profile has', 'profiles have')} not reached more than {params.maxPendingPct}% of their devices",
+    "columns": {
+      "Profile": "it.Name",
+      "Pending": "it.PendingCount",
+      "Targeted": "it.TargetedDeviceCount",
+      "Modified": "it.LastModified:d"
+    },
+    "exposure": "Share(Items.Sum(i => i.PendingCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The policy is neither applied nor failed, it simply has not arrived, usually because the devices are not checking in.",
+    "remediation": [
+      "Cross-check against devices that have not contacted the service recently, which is usually the same population.",
+      "Where the devices are healthy, look for a network path or proxy blocking the service endpoints."
+    ]
+  },
+  "related": [
+    "DEV-001"
+  ]
+}

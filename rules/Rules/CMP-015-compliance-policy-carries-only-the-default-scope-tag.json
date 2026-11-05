@@ -1,0 +1,47 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-015",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CMP",
+  "title": "Compliance policy carries only the default scope tag",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.ScopeTags.Any(t => !t.IsDefault)",
+  "requires": [
+    "CompliancePolicies",
+    "ScopeTags"
+  ],
+  "scope": "Facts.CompliancePolicies",
+  "where": "it.ScopeTagsKnown",
+  "when": "it.OnlyDefaultScopeTag",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} compliance {Plural(Items.Count, 'policy is', 'policies are')} outside the scope tags this tenant uses",
+    "columns": {
+      "Policy": "it.Name",
+      "Platform": "it.Platform",
+      "Scope tags": "it.ScopeTagSummary"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The organisation has divided administrative responsibility, and these policies sit outside that division. Anyone who can edit compliance can edit them, including for parts of the estate they do not look after.",
+    "technicalDetail": "A policy carrying only the default tag is visible to every administrator whose role assignment includes the default, which in most tenants is all of them.",
+    "remediation": [
+      "Apply the scope tag matching the part of the estate each policy governs.",
+      "Tag the role assignments to match, since a tag on the object alone changes nothing."
+    ],
+    "cannotSee": "A policy whose scope tags Graph did not return is passed over rather than reported as untagged. Whether the division of responsibility this tenant has drawn is the right one is not a question this can answer; it reports only that these policies sit outside it."
+  },
+  "related": [
+    "ACC-007",
+    "HYG-010",
+    "TEN-009"
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-020",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "APP",
+  "title": "Available applications assigned to All Users without a filter",
+  "type": "BestPractice",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Apps"
+  ],
+  "scope": "Facts.Apps",
+  "where": "it.HasAvailableAssignment",
+  "when": "it.Assignments.Any(a => !a.IsExclusion && a.Intent != null && (a.Intent == 'available' || a.Intent == 'availableWithoutEnrollment') && a.IsAllUsers && a.FilterId == null)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} available {Plural(Items.Count, 'application is', 'applications are')} offered to All Users without a filter",
+    "columns": {
+      "Application": "it.Name",
+      "Publisher": "it.Publisher",
+      "Type": "it.AppType",
+      "Assigned to": "it.AssignmentSummary"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Every licensed user sees software in Company Portal whether they need it or not, which spreads unsupported titles and muddies what the organisation actually standardises on.",
+    "remediation": [
+      "Narrow available assignments to the groups that should see the title, or add an include filter that matches the intended device or ownership shape."
+    ],
+    "cannotSee": "Required assignments to All Users are a different question. Whether Company Portal is deployed is APP-011. Exclude filters on the same assignment are ignored for this raise."
+  },
+  "related": [
+    "APP-011",
+    "HYG-003",
+    "HYG-007"
+  ]
+}

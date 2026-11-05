@@ -1,0 +1,49 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ACC-013",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ACC",
+  "title": "Application holds high-impact Microsoft Graph write permissions",
+  "type": "BestPractice",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "ServicePrincipals"
+  ],
+  "scope": "Facts.ServicePrincipals",
+  "when": "it.HasHighImpactGraphWritePermission && !AnyMatch(params.approvedApplicationIds, it.Id)",
+  "params": {
+    "approvedApplicationIds": {
+      "default": [],
+      "text": "Service-principal object IDs for approved administrative applications in this tenant"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'application holds', 'applications hold')} high-impact Graph write permissions",
+    "columns": {
+      "Application": "it.DisplayName",
+      "Object ID": "it.Id",
+      "Permissions": "it.HighImpactGraphWritePermissions"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "These application permissions can change directory objects, privileged role membership, application credentials or API grants without a person signing in. A compromised application credential can therefore increase access across the tenant.",
+    "remediation": [
+      "Confirm each application's owner, purpose and continued need for every listed permission.",
+      "Remove broad write grants where a narrower permission or read-only access is sufficient.",
+      "List approved administrative applications by service-principal object ID in this tenant's rule override."
+    ],
+    "cannotSee": "Requires the optional Application.Read.All permission; without it this check is skipped. It reads Microsoft Graph application-permission grants, not an application's credentials, activity or directory-role assignments. The approvedApplicationIds list is a tenant decision and is empty until configured."
+  },
+  "related": [
+    "ACC-010"
+  ],
+  "learnMore": "https://learn.microsoft.com/en-us/graph/permissions-reference"
+}

@@ -1,0 +1,53 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-007",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "APP",
+  "title": "Installed applications are behind their latest release",
+  "type": "OperationalFailure",
+  "severity": "High",
+  "confidence": "Medium",
+  "effort": "Medium",
+  "requires": [
+    "DetectedApps",
+    "AppList",
+    "Devices"
+  ],
+  "scope": "Facts.DetectedApps",
+  "where": "it.IsWindows && Ref.AppList.IsTracked(it.Name, it.Publisher)",
+  "when": "VersionBefore(it.Version, Ref.AppList.Latest(it.Name, it.Publisher))",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} installed application {Plural(Items.Count, 'version is', 'versions are')} behind the latest release",
+    "columns": {
+      "Application": "it.Name",
+      "Installed": "it.Version",
+      "Latest": "Ref.AppList.Latest(it.Name, it.Publisher)",
+      "Devices": "it.DeviceCount",
+      "Application ID": "Ref.AppList.ApplicationId(it.Name, it.Publisher)"
+    },
+    "exposure": "Share(Items.Select(i => i.DeviceCount).Max(), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Applications on Windows devices are older than the release their publisher has shipped. Third-party software is where a large share of exploited vulnerabilities live, and an old version leaves every flaw fixed since it shipped open on the devices that run it.",
+    "technicalDetail": "Compares each application Intune discovered on Windows devices with the latest version the app list gives for an application of exactly the same name and publisher, or of exactly the same name where no entry has that publisher. Where the list has no entry of the whole name, the product name is matched the same way: the name with a leading 'Update for', anything in brackets, the version and the architecture taken off, so '7-Zip 25.01 (x64)' is compared as '7-Zip'. Exposure is the share of Windows devices holding the most widely installed of these versions, which is the least the finding reaches.",
+    "remediation": [
+      "Update the listed applications, most widely installed first, through their own update mechanism, a superseding Win32 app or Windows Package Manager.",
+      "Where an application must not update itself, repackage it from the current release and supersede the old package.",
+      "Remove applications nobody needs rather than keeping them current."
+    ],
+    "cannotSee": "An application whose name differs from the app list's in more than its version, brackets, architecture or a leading 'Update for' is not compared, and a name two app list entries share is judged only when the publisher Intune reports is exactly the vendor of one of them. Intune lists every application only on corporate-owned devices, and the managed ones alone on personal devices. A version that is not plain dotted numbers is not compared. The latest version is the newest release the app list holds, which can be newer than a channel chosen on purpose, such as an extended support release. The inventory is the whole tenant's, whatever scope the run was given."
+  },
+  "frameworks": [
+    "CE:security-update-management"
+  ],
+  "related": [
+    "APP-006",
+    "APP-008",
+    "APP-021"
+  ]
+}

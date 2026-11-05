@@ -1,0 +1,35 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-009",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "APP",
+  "title": "Microsoft Store for Business applications are still present",
+  "type": "Hygiene",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Apps"
+  ],
+  "scope": "Facts.Apps",
+  "when": "it.AppType == 'MicrosoftStoreForBusiness'",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'application uses', 'applications use')} the retired Store for Business",
+    "columns": {
+      "Application": "it.DisplayName",
+      "Assigned to": "it.AssignedGroupNames"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The service behind these packages has been retired, so they will not install on new devices and will not update on existing ones.",
+    "remediation": [
+      "Replace each with the Microsoft Store app type and reassign, then delete the old packages."
+    ]
+  }
+}

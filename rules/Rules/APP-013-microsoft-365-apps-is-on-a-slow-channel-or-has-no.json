@@ -1,0 +1,43 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-013",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "APP",
+  "title": "Microsoft 365 Apps is on a slow channel or has no channel set",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Apps"
+  ],
+  "scope": "Facts.Apps",
+  "when": "it.IsMicrosoft365Apps && (it.UpdateChannel == null || Ref.Office.IsSlowChannel(it.UpdateChannel))",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Microsoft 365 Apps {Plural(Items.Count, 'deployment is', 'deployments are')} on a slow or unset channel",
+    "columns": {
+      "Application": "it.DisplayName",
+      "Channel": "it.UpdateChannel",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Security fixes for the office suite arrive months later than they could, and the suite is the most common route into an organisation.",
+    "remediation": [
+      "Move the broad population to Monthly Enterprise Channel, keeping Semi-Annual only where an add-in genuinely requires it."
+    ],
+    "cannotSee": "A deployment that sets no channel is reported beside the slow ones, because what a device then does is Microsoft's own default rather than something this tool can read. Which channels count as slow is reference data the pack carries, so a channel added after this pack is not judged."
+  },
+  "frameworks": [
+    "CE:security-update-management"
+  ],
+  "related": [
+    "APP-014"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-011",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CMP",
+  "title": "No notification before a device is marked non-compliant",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CompliancePolicies"
+  ],
+  "scope": "Facts.CompliancePolicies",
+  "when": "!it.Actions.Any(a => a.Type == 'notification')",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} compliance {Plural(Items.Count, 'policy marks', 'policies mark')} a device non-compliant without warning the user first",
+    "columns": {
+      "Policy": "it.Name",
+      "Assigned to": "it.AssignmentSummary",
+      "Actions": "it.Actions.Count()"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The device is marked non-compliant with nothing said to the person using it. Where Conditional Access acts on compliance, the first they know is losing access to their mail or files, so a problem they could have fixed themselves becomes a service desk call.",
+    "remediation": [
+      "Add a Send email to end user action ahead of the Mark device noncompliant one, with a message saying what to do about it."
+    ],
+    "cannotSee": "Whether the notification says anything useful is not read, only that one is scheduled. A policy that emails an empty template counts here as one that warns. Compliance authored in the Settings Catalog is not read: this tool reads the typed compliance API, so a policy authored there is invisible. Whether an unassigned policy is a draft or an oversight is also not visible, and the Assigned to column says which listed policies reach nobody."
+  },
+  "related": [
+    "CMP-010"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-016",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "APP",
+  "title": "Broken application dependency chains",
+  "type": "OperationalFailure",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Apps"
+  ],
+  "scope": "Facts.Apps",
+  "when": "it.Dependencies.Any(d => !Facts.Apps.Any(a => a.Id == d.AppId))",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'application depends', 'applications depend')} on a package that no longer exists",
+    "columns": {
+      "Application": "it.DisplayName",
+      "Missing dependency": "it.Dependencies.Where(d => !Facts.Apps.Any(a => a.Id == d.AppId)).Select(d => d.AppName)"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The installation cannot proceed, so the application fails on every device with no obvious cause in its own error message.",
+    "remediation": [
+      "Restore the dependency package, or remove the dependency and handle the prerequisite another way."
+    ],
+    "cannotSee": "Dependencies are read one application at a time, so an application whose relationships this run could not read is not judged. Intune removes a relationship when the application it points at is deleted, so what this finds is a chain pointing at a package outside the applications this run read rather than at one that never existed."
+  },
+  "related": [
+    "APP-002"
+  ]
+}

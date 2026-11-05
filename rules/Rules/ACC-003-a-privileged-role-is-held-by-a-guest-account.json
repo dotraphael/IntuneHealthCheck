@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ACC-003",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ACC",
+  "title": "A privileged role is held by a guest account",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EntraRoleAssignments"
+  ],
+  "scope": "Facts.EntraRoleAssignments",
+  "when": "it.IsGuest && Ref.Roles.IsPrivileged(it.RoleName)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} guest {Plural(Items.Count, 'account holds', 'accounts hold')} a privileged role",
+    "columns": {
+      "Account": "it.PrincipalName",
+      "Role": "it.RoleName",
+      "Assignment": "it.AssignmentType"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "An account governed by another organisation's security controls holds administrative rights here. Their password policy, their multi-factor settings and their joiners and leavers process become yours.",
+    "remediation": [
+      "Replace the guest assignment with an account in this tenant.",
+      "Where external administration is deliberate, make the assignment eligible and time bound."
+    ]
+  },
+  "frameworks": [
+    "CE:user-access-control"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-007",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CMP",
+  "title": "Compliance does not require code integrity",
+  "type": "BestPractice",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CompliancePolicies"
+  ],
+  "scope": "Facts.CompliancePolicies",
+  "where": "it.Platform == 'Windows'",
+  "when": "it.RequireCodeIntegrity == false",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} compliance {Plural(Items.Count, 'policy does', 'policies do')} not require code integrity",
+    "columns": {
+      "Policy": "it.Name",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Kernel level tampering would not be reflected in the device's compliance state, so a compromised machine keeps its access.",
+    "remediation": [
+      "Enable Require code integrity, which reports on the health attestation the device already produces."
+    ],
+    "cannotSee": "Compliance authored in the Settings Catalog is not read: this tool reads the typed compliance API, so a requirement set in a Settings Catalog compliance policy is invisible here and a tenant that has moved to them is judged only on what it left behind. Whether an unassigned policy is a draft or an oversight is also not visible, and the Assigned to column says which listed policies reach nobody."
+  }
+}

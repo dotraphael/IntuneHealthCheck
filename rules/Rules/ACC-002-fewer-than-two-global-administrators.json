@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ACC-002",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ACC",
+  "title": "Fewer than two Global Administrators",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EntraRoleAssignments"
+  ],
+  "scope": "Facts.EntraRoleAssignments",
+  "when": "it.RoleName == 'Global Administrator'",
+  "raiseWhen": "Items.Count() < 2",
+  "report": {
+    "mode": "aggregate",
+    "title": "Only {Items.Count} account holds Global Administrator",
+    "columns": {
+      "Account": "it.PrincipalName"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "If the single administrator account is lost, locked out or leaves, nobody can administer the tenant and recovery goes through Microsoft support.",
+    "remediation": [
+      "Create two emergency access accounts excluded from Conditional Access, with long random passwords stored securely.",
+      "Monitor their sign-ins, since they should almost never be used."
+    ]
+  },
+  "related": [
+    "ACC-001"
+  ]
+}

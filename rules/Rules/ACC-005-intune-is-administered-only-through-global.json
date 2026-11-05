@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ACC-005",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ACC",
+  "title": "Intune is administered only through Global Administrator",
+  "type": "BestPractice",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Medium",
+  "requires": [
+    "IntuneRoleAssignments",
+    "EntraRoleAssignments",
+    "Groups"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.IntuneRoleAssignments.Any(a => !a.MembersKnown || a.MemberCount > 0) && !Facts.EntraRoleAssignments.Any(r => r.RoleName == 'Intune Administrator' || r.RoleName == 'Intune Service Administrator')",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Everyone who touches Intune needs the highest privilege in the tenant to do routine work, which is a large blast radius for a task as ordinary as assigning an application.",
+    "technicalDetail": "An Intune role assignment counts as delegation when it reaches at least one person. A role assigned to an empty group grants nothing, so a tenant whose only assignments are empty is administered through the directory roles whatever the roles list shows.",
+    "remediation": [
+      "Create Intune roles matched to what each team actually does.",
+      "Start with a read-only role for support staff, which covers most day to day questions."
+    ],
+    "cannotSee": "An assignment whose group membership could not be read is counted as delegation rather than against the tenant, so a run without group membership will not raise this. Whether the people holding Intune Administrator actually use it, rather than signing in as Global Administrator out of habit, is not visible from any of this."
+  },
+  "related": [
+    "ACC-001",
+    "TEN-009"
+  ]
+}

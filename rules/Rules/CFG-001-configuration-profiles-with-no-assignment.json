@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CFG-001",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CFG",
+  "title": "Configuration profiles with no assignment",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles"
+  ],
+  "scope": "Facts.ConfigurationProfiles",
+  "when": "!it.Assignments.Any()",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} configuration {Plural(Items.Count, 'profile is', 'profiles are')} not assigned",
+    "columns": {
+      "Profile": "it.Name",
+      "Platform": "it.Platform",
+      "Modified": "it.LastModified:d"
+    },
+    "exposure": "1",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "Work has been done that reaches no device. Each unassigned profile is either an unfinished change or a control someone believes is in force when it is not.",
+    "remediation": [
+      "Assign the profiles that are still wanted.",
+      "Delete the rest, after checking their history for why they were created."
+    ]
+  },
+  "related": [
+    "CFG-002"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CFG-013",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CFG",
+  "title": "Deprecated settings are in use",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles"
+  ],
+  "scope": "Facts.ConfigurationProfiles",
+  "when": "it.Settings.Any(s => Ref.DeprecatedSettings.Contains(s.Id))",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'profile uses', 'profiles use')} deprecated settings",
+    "columns": {
+      "Profile": "it.Name",
+      "Settings": "it.Settings.Where(s => Ref.DeprecatedSettings.Contains(s.Id)).Count()"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Deprecated settings stop being honoured at some point without any error appearing, so a control can lapse silently.",
+    "remediation": [
+      "Replace each deprecated setting with its current equivalent, listed in the reference data."
+    ],
+    "cannotSee": "The deprecated list ships in the rule pack and reflects guidance at the time the pack was built."
+  }
+}

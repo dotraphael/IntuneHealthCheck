@@ -1,0 +1,43 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CFG-002",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CFG",
+  "title": "Configuration profiles assigned only to empty groups",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles",
+    "Groups"
+  ],
+  "scope": "Facts.ConfigurationProfiles",
+  "where": "it.Assignments.Any() && it.StatusKnown",
+  "when": "it.TargetedDeviceCount == 0 && it.TargetedUserCount == 0",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} configuration {Plural(Items.Count, 'profile reaches', 'profiles reach')} no devices",
+    "columns": {
+      "Profile": "it.Name",
+      "Assigned to": "it.AssignedGroupNames"
+    },
+    "exposure": "1",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "The assignment exists, so the profile looks deployed on the console, but the group it targets is empty. This is the failure mode that looks most like success.",
+    "remediation": [
+      "Check whether the group's membership rule has stopped matching, or whether members were removed.",
+      "Retarget or delete."
+    ],
+    "cannotSee": "Reads the per-profile status summary, which Intune keeps for template and custom profiles but not for Settings Catalog policies. A Settings Catalog policy assigned to an empty group is therefore not reported here."
+  },
+  "related": [
+    "CFG-001",
+    "HYG-005"
+  ]
+}

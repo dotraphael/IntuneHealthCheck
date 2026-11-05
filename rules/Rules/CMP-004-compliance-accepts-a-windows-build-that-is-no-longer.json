@@ -1,0 +1,51 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-004",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CMP",
+  "title": "Compliance accepts a Windows build that is no longer supported",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CompliancePolicies",
+    "WindowsBuilds"
+  ],
+  "scope": "Facts.CompliancePolicies",
+  "where": "it.Platform == 'Windows'",
+  "when": "(it.MinimumOsVersion != null && (!Ref.WindowsBuilds.IsWindowsVersion(it.MinimumOsVersion) || (Ref.WindowsBuilds.IsKnown(it.MinimumOsVersion) && !Ref.WindowsBuilds.IsSupported(it.MinimumOsVersion)))) || (it.MaximumOsVersion != null && (!Ref.WindowsBuilds.IsWindowsVersion(it.MaximumOsVersion) || (Ref.WindowsBuilds.IsKnown(it.MaximumOsVersion) && !Ref.WindowsBuilds.IsSupported(it.MaximumOsVersion))))",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} compliance {Plural(Items.Count, 'policy accepts', 'policies accept')} an unsupported Windows build",
+    "columns": {
+      "Policy": "it.Name",
+      "Minimum version": "it.MinimumOsVersion == null ? 'not set' : it.MinimumOsVersion",
+      "Maximum version": "it.MaximumOsVersion == null ? 'not set' : it.MaximumOsVersion",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The check gives a false sense of assurance: devices on builds that no longer receive security updates pass compliance and keep their access.",
+    "technicalDetail": "Both ends of the range a policy accepts are checked, and a version is judged three ways. A minimum on a build past its end of service lets an unsupported device pass; a maximum on one holds every device at a build Microsoft no longer services; and a value that is not a Windows build at all, which Intune accepts as free text, sets a boundary no device can be on either side of. Graph reports a version as 10.0.build.revision and the Windows build list is keyed by the build, which the accessor reconciles.",
+    "remediation": [
+      "Raise the minimum operating system version to the oldest build still in support.",
+      "Give a grace period before non-compliance blocks access, so the update has time to land."
+    ],
+    "cannotSee": "Which builds are supported comes from the Windows build list published beside the rules, so a Windows build released since the list was last updated, or one the vendor has not recorded, is treated as unknown rather than unsupported and the policy is left alone. A value that is not shaped like a Windows build at all is reported whatever the list holds, though with no copy of the list at all the rule is not evaluated. Long term servicing builds share their build number with the twice-yearly release and are serviced for far longer, so a tenant running one is judged against the wrong date here."
+  },
+  "frameworks": [
+    "CE:security-update-management"
+  ],
+  "related": [
+    "CMP-005",
+    "CMP-016",
+    "DEV-006",
+    "UPD-011"
+  ]
+}

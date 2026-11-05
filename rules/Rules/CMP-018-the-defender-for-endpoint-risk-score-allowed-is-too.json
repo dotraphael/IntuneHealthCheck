@@ -1,0 +1,54 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-018",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CMP",
+  "title": "The Defender for Endpoint risk score allowed is too high",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Tenant.HasDefenderForEndpoint",
+  "requires": [
+    "CompliancePolicies",
+    "Tenant"
+  ],
+  "scope": "Facts.CompliancePolicies",
+  "where": "it.Platform == 'Windows' && it.RequireThreatProtection == true",
+  "when": "Ref.ThreatLevels.IsWeakerThan(it.ThreatProtectionLevel, params.strictestAllowed)",
+  "params": {
+    "strictestAllowed": {
+      "default": "medium",
+      "text": "The worst machine risk score a device may carry and still be compliant"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} compliance {Plural(Items.Count, 'policy allows', 'policies allow')} a device at higher risk than it should",
+    "columns": {
+      "Policy": "it.Name",
+      "Allows up to": "Ref.ThreatLevels.Name(it.ThreatProtectionLevel)",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The requirement is switched on but set so loosely that a device Defender for Endpoint rates as high risk still counts as compliant, so the check exists and changes nothing.",
+    "remediation": [
+      "Set the machine risk score to Medium, so a device rated medium or high is marked non-compliant.",
+      "Where an estate is noisy, start at High, work through what it finds, then tighten."
+    ],
+    "cannotSee": "The level the policy asks for is read, not how many devices are actually at or above it. Which levels count as too loose is the pack's ordering rather than anything Graph publishes, and the floor is a parameter, so a tenant that has decided on High can say so and stop being reported. A level this pack has no rank for settles nothing, which includes a policy that switched the requirement on and chose no level at all. Whether the Intune connector for Defender for Endpoint is switched on is not read, only that the tenant is licensed, so a tenant that has the licence and has never connected the two is reported here as well. Compliance authored in the Settings Catalog is not read at all."
+  },
+  "frameworks": [
+    "CE:malware-protection"
+  ],
+  "related": [
+    "CMP-017"
+  ]
+}

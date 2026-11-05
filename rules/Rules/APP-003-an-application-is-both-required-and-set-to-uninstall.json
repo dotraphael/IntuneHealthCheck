@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-003",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "APP",
+  "title": "An application is both required and set to uninstall for overlapping groups",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "Apps",
+    "Groups",
+    "Devices"
+  ],
+  "scope": "Facts.Derived.ConflictingIntentApps",
+  "when": "it.DeviceCount > 0",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'application has', 'applications have')} conflicting install and uninstall assignments",
+    "columns": {
+      "Application": "it.AppName",
+      "Installed for": "it.RequiredGroups",
+      "Removed for": "it.UninstallGroups",
+      "Devices in both": "it.DeviceCount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Affected devices install and remove the same application repeatedly, consuming bandwidth and generating support calls that look inexplicable from the user's side.",
+    "remediation": [
+      "Separate the groups, or exclude the uninstall population from the required assignment."
+    ],
+    "cannotSee": "The two populations are resolved from group membership, so an application assigned through a group whose members this run could not read is not judged. Intune will not let one group carry both intents, so the conflict this finds is always between two different groups whose members overlap."
+  }
+}

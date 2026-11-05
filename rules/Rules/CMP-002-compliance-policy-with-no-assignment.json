@@ -1,0 +1,38 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-002",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CMP",
+  "title": "Compliance policy with no assignment",
+  "type": "Hygiene",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CompliancePolicies"
+  ],
+  "scope": "Facts.CompliancePolicies",
+  "when": "!it.Assignments.Any()",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} compliance {Plural(Items.Count, 'policy is', 'policies are')} not assigned",
+    "columns": {
+      "Policy": "it.Name",
+      "Platform": "it.Platform",
+      "Modified": "it.LastModified:d"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The standard is written but not applied. Devices are being judged by whatever else exists, or by nothing.",
+    "technicalDetail": "A policy with no assignment applies to nobody. Its settings are still read and still judged by the rest of this domain, so anything wrong inside it is reported here as well: an unassigned policy is a problem found before it becomes one, and the evidence tables mark it as not assigned.",
+    "remediation": [
+      "Assign the policy, or delete it if it has been superseded."
+    ],
+    "cannotSee": "Whether a policy was left unassigned deliberately, as a draft or a template, or by mistake."
+  }
+}

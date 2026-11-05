@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-001",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CMP",
+  "title": "No compliance policy for Windows",
+  "type": "MissingCapability",
+  "severity": "Critical",
+  "confidence": "High",
+  "effort": "Medium",
+  "applies": "Facts.Devices.WindowsCount > 0",
+  "requires": [
+    "CompliancePolicies"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.CompliancePolicies.Any(c => c.Platform == 'Windows' && c.Assignments.Any())",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Nothing checks whether devices meet a security standard, so nothing can be enforced. Every other control here is advisory until compliance exists.",
+    "remediation": [
+      "Create a Windows compliance policy covering encryption, secure boot and a minimum operating system version.",
+      "Assign it to all Windows devices and pair it with a Conditional Access policy requiring a compliant device."
+    ],
+    "cannotSee": "Compliance authored in the Settings Catalog is not read: this tool reads the typed compliance API, so a tenant that has moved its Windows compliance there is told it has none. Check the console before acting on this finding."
+  },
+  "frameworks": [
+    "CE:secure-configuration"
+  ],
+  "related": [
+    "CAD-001",
+    "CMP-014"
+  ]
+}

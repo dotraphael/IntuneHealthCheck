@@ -1,0 +1,50 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CAD-012",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CAD",
+  "title": "Security information registration is not protected",
+  "type": "MissingCapability",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Medium",
+  "requires": [
+    "CaPolicies"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.CaPolicies.Any(c => c.State == 'enabled' && c.UserAction == 'RegisterSecurityInformation' && (c.Grant.RequireMfa || c.Grant.RequireAuthenticationStrength || c.Grant.BlockAccess) && c.Grant.RequiresEveryControl)",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25,
+    "table": {
+      "source": "Facts.CaPolicies.Where(c => c.UserAction == 'RegisterSecurityInformation')",
+      "columns": {
+        "Policy": "it.Name",
+        "State": "it.State",
+        "Applies to": "it.UserScopeSummary",
+        "Controls": "it.Grant.Summary"
+      }
+    }
+  },
+  "messages": {
+    "businessImpact": "Anyone holding a stolen password can add a sign-in method of their own to the account, and from then on the multi-factor challenges the rest of the tenant relies on are answered by them rather than by the user.",
+    "technicalDetail": "A protecting policy must be enabled, target the Register security information user action, and require multi-factor authentication, an authentication strength or a block, with every named control required rather than offered as an alternative. Registering or joining a device is ENR-017's question.",
+    "remediation": [
+      "Create an enabled Conditional Access policy for the Register security information user action that requires multi-factor authentication, or blocks the action outside trusted locations.",
+      "Give new starters who have no method yet a Temporary Access Pass rather than leaving registration open.",
+      "Exclude emergency access accounts and protect them another way."
+    ],
+    "cannotSee": "Who the policy covers is not compared with the directory, so a policy over some users counts although it may leave guests or contractors open. A block limited to untrusted locations counts however wide the trusted locations are. The Authentication Methods policy and Temporary Access Pass settings are not read."
+  },
+  "frameworks": [
+    "CE:user-access-control"
+  ],
+  "related": [
+    "CAD-005",
+    "ENR-017"
+  ]
+}

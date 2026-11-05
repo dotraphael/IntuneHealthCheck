@@ -1,0 +1,48 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-008",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CMP",
+  "title": "Compliance does not require antivirus to be running",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CompliancePolicies"
+  ],
+  "scope": "Facts.CompliancePolicies",
+  "where": "it.Platform == 'Windows'",
+  "when": "(it.RequireDefenderAntimalware == false && it.RequireAntivirus == false && it.RequireAntiSpyware == false) || (it.RequireDefenderAntimalware == true && it.RequireRealTimeProtection == false)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} compliance {Plural(Items.Count, 'policy does', 'policies do')} not require antivirus to be running",
+    "columns": {
+      "Policy": "it.Name",
+      "Assigned to": "it.AssignmentSummary",
+      "Defender": "it.RequireDefenderAntimalware",
+      "Any antivirus": "it.RequireAntivirus",
+      "Real time": "it.RequireRealTimeProtection"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A device with no antivirus running, or with Defender installed and switched off, stays compliant, so the one condition most likely to precede an incident has no effect on access.",
+    "remediation": [
+      "Require an antivirus product in each policy listed: Microsoft Defender Antimalware where Defender is the product, or the antivirus and antispyware requirements where another vendor is.",
+      "Where Defender is required, require real-time protection with it."
+    ],
+    "cannotSee": "Four requirements are read and any one of them counts, because a tenant using another vendor's antivirus sets the antivirus and antispyware requirements and leaves the Defender one alone; a policy asking for none of the four is what this reports, and so is one that requires Defender while allowing real-time protection to be off. A policy for a platform that has no such property at all is passed over rather than reported, because it could never have carried the requirement. Compliance authored in the Settings Catalog is not read: this tool reads the typed compliance API, so a requirement set there is invisible here. Whether an unassigned policy is a draft or an oversight is also not visible, and the Assigned to column says which listed policies reach nobody."
+  },
+  "frameworks": [
+    "CE:malware-protection"
+  ],
+  "related": [
+    "SEC-006",
+    "SEC-007"
+  ]
+}

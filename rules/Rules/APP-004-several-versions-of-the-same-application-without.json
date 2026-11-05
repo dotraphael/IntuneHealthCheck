@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-004",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "APP",
+  "title": "Several versions of the same application without supersedence",
+  "type": "Hygiene",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "Apps"
+  ],
+  "scope": "Facts.Derived.AppFamilies",
+  "when": "it.VersionCount > 1 && !it.UsesSupersedence",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'application is', 'applications are')} deployed in several versions at once",
+    "columns": {
+      "Application": "it.Name",
+      "Versions": "it.Versions",
+      "Packages": "it.PackageCount",
+      "Assigned": "it.AssignedVersionCount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Which version a device ends up with depends on order rather than intent, and older versions keep installing over newer ones.",
+    "remediation": [
+      "Configure supersedence so the new version replaces the old.",
+      "Remove assignments from versions that are no longer wanted."
+    ],
+    "cannotSee": "Versions of one application are recognised by the name a packager wrote, with the version and the packaging suffix taken off and the architecture kept, because Intune links two versions only where somebody built a supersedence chain. The 64-bit and the 32-bit build of one product are two applications here rather than one deployed twice, and a tenant that names its packages some other way has them read as separate applications. Two packages of the same version are a duplicate rather than a version conflict, so they are not counted as versions. An application whose relationships this run could not read counts as using supersedence, so it is passed over rather than accused. The application list is the Windows estate's: iOS, macOS and Android packages are left out of the run entirely, so nothing here counts them."
+  },
+  "related": [
+    "APP-005"
+  ]
+}

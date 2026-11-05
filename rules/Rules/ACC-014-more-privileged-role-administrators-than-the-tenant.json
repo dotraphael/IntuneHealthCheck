@@ -1,0 +1,60 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ACC-014",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ACC",
+  "title": "More Privileged Role Administrators than the tenant needs",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EntraRoleAssignments"
+  ],
+  "scope": "Facts.EntraRoleAssignments",
+  "when": "it.RoleName == 'Privileged Role Administrator' && !AnyMatch(params.excludeAccounts, it.PrincipalName)",
+  "raiseWhen": "Items.Count() > params.maxPrivilegedRoleAdmins",
+  "params": {
+    "excludeAccounts": {
+      "default": [],
+      "text": "Emergency access accounts to leave out of the count, by name or with * and ? wildcards"
+    },
+    "maxPrivilegedRoleAdmins": {
+      "default": 2,
+      "range": [
+        1,
+        10
+      ],
+      "text": "Privileged Role Administrators above which the risk outweighs the convenience"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} accounts hold Privileged Role Administrator",
+    "columns": {
+      "Account": "it.PrincipalName",
+      "Assignment": "it.AssignmentType",
+      "Enabled": "it.AccountEnabled"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Privileged Role Administrator can grant every other privileged role, including Global Administrator. Extra holders are a second path to full control of the directory.",
+    "remediation": [
+      "Keep the role on a small set of eligible administrators through Privileged Identity Management.",
+      "List emergency accounts in the exclusions for this rule."
+    ],
+    "cannotSee": "Same emergency-account blind spot as ACC-001. Eligible versus permanent is ACC-004."
+  },
+  "frameworks": [
+    "CE:user-access-control"
+  ],
+  "related": [
+    "ACC-001",
+    "ACC-004"
+  ]
+}

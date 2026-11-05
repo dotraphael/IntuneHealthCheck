@@ -1,0 +1,38 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-018",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 3,
+  "domain": "APP",
+  "title": "Self-service applications are missing a description or a publisher",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Apps"
+  ],
+  "scope": "Facts.Apps",
+  "where": "it.HasAvailableAssignment",
+  "when": "it.Description == null || it.Publisher == null",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} self-service {Plural(Items.Count, 'application is', 'applications are')} incompletely described",
+    "columns": {
+      "Application": "it.DisplayName",
+      "Publisher": "it.Publisher",
+      "Has description": "it.Description != null"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Users browsing Company Portal see unidentifiable entries, so they either install the wrong thing or call the service desk instead.",
+    "remediation": [
+      "Add a description, publisher and icon for every application offered to users."
+    ],
+    "cannotSee": "The icon is not judged. Graph returns no icon in a list of applications, only when each one is read on its own, which is a call per application this tool does not make, so an application with a description and a publisher and no icon is not reported here."
+  }
+}

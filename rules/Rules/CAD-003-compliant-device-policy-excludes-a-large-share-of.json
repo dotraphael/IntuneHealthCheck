@@ -1,0 +1,50 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CAD-003",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CAD",
+  "title": "Compliant device policy excludes a large share of users",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CaPolicies",
+    "Groups"
+  ],
+  "scope": "Facts.CaPolicies",
+  "where": "it.State == 'enabled' && it.Grant.RequireCompliantDevice",
+  "when": "Pct(it.ExcludedUserCount, Facts.Tenant.LicensedUserCount) > params.maxExcludedPct",
+  "params": {
+    "maxExcludedPct": {
+      "default": 10,
+      "range": [
+        0,
+        100
+      ],
+      "text": "Share of users excluded before the policy stops being general"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} device compliance {Plural(Items.Count, 'policy excludes', 'policies exclude')} more than {params.maxExcludedPct}% of users",
+    "columns": {
+      "Policy": "it.Name",
+      "Excluded": "it.ExcludedUserCount",
+      "Excluded groups": "it.ExcludedGroupNames"
+    },
+    "exposure": "Share(Items.Select(i => i.ExcludedUserCount).Max(), Facts.Tenant.LicensedUserCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Exclusions added for a migration or a pilot tend to outlive their reason, and each one is a population reaching company data from devices nobody is checking.",
+    "remediation": [
+      "Review each exclusion group and remove the members who no longer need it.",
+      "Keep emergency access accounts excluded; everything else should be time bound."
+    ],
+    "cannotSee": "How many people the tenant licenses exactly. The share is measured against the largest number of seats consumed on any one subscription, which is the closest a subscription list gets, and an excluded group that would not answer for its membership counts nobody rather than a guess."
+  }
+}

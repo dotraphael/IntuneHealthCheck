@@ -1,0 +1,52 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-021",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "APP",
+  "title": "Intune application packages are behind their latest release",
+  "type": "BestPractice",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Medium",
+  "requires": [
+    "Apps",
+    "AppList"
+  ],
+  "scope": "Facts.Apps",
+  "where": "!it.IsSuperseded && Ref.AppList.IsTracked(it.Name, it.Publisher)",
+  "when": "VersionBefore(it.PackageVersion, Ref.AppList.Latest(it.Name, it.Publisher))",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} application {Plural(Items.Count, 'package is', 'packages are')} behind the latest release",
+    "columns": {
+      "Application": "it.DisplayName",
+      "Packaged": "it.PackageVersion",
+      "Latest": "Ref.AppList.Latest(it.Name, it.Publisher)",
+      "Assignments": "it.Assignments.Count",
+      "Application ID": "Ref.AppList.ApplicationId(it.Name, it.Publisher)"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Software packaged for deployment is older than the release its publisher has shipped. Every device that installs one of these packages, new devices included, receives a version with every flaw fixed since left open, and a package that only updates an installed copy brings devices up to an old release rather than the current one.",
+    "technicalDetail": "Compares each Windows application package in Intune that no other package supersedes, assigned or not, with the latest version the app list gives for it. The packaged version is the package's own version field, or the version in its name where that field is empty. A package is matched on its whole name and publisher, then on its whole name alone, and where the list has no entry of the whole name, on its product name the same way: the name with a leading 'Update for', anything in brackets, the version and the architecture taken off, so 'Update for 1Password 8.12.42 (MSI-x64)' is compared as '1Password'.",
+    "remediation": [
+      "Repackage the listed applications from the current release and supersede the old package, or move them to a source that keeps them current.",
+      "Delete packages nobody deploys rather than keeping them current.",
+      "Where a release channel is held back on purpose, record its latest release in your organisation's copy of the app list, so the package is judged against that channel."
+    ],
+    "cannotSee": "A package whose product name differs from the app list's in more than its version, brackets, architecture or a leading 'Update for' is not compared, and a name two app list entries share is judged only when the package's publisher is exactly the vendor of one of them. The latest version is the app list's newest release of the product, so a package held on an older release line on purpose, such as a long-term support release, is reported as behind. A package whose relationships this run could not read counts as not superseded and is compared. A version that is not plain dotted numbers is not compared. iOS, macOS and Android packages are left out of the run entirely."
+  },
+  "frameworks": [
+    "CE:security-update-management"
+  ],
+  "related": [
+    "APP-005",
+    "APP-006",
+    "APP-007"
+  ]
+}

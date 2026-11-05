@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ACC-004",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ACC",
+  "title": "Privileged roles are assigned permanently while Privileged Identity Management is available",
+  "type": "BestPractice",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Medium",
+  "applies": "Facts.Tenant.HasEntraP2",
+  "requires": [
+    "EntraRoleAssignments",
+    "Tenant"
+  ],
+  "scope": "Facts.EntraRoleAssignments",
+  "when": "it.AssignmentType == 'Permanent' && Ref.Roles.IsPrivileged(it.RoleName)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} privileged {Plural(Items.Count, 'assignment is', 'assignments are')} permanent rather than eligible",
+    "columns": {
+      "Account": "it.PrincipalName",
+      "Role": "it.RoleName"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Administrative rights are always active, so a compromised session is immediately an administrative session. Making them eligible means rights exist only while they are being used, and every activation is recorded.",
+    "remediation": [
+      "Convert the assignments listed to eligible in Privileged Identity Management.",
+      "Require approval and justification for the highest roles.",
+      "Leave emergency access accounts permanently assigned."
+    ]
+  },
+  "related": [
+    "ACC-001"
+  ]
+}

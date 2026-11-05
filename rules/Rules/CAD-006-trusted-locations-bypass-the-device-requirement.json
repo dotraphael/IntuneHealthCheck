@@ -1,0 +1,37 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CAD-006",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CAD",
+  "title": "Trusted locations bypass the device requirement",
+  "type": "BestPractice",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CaPolicies"
+  ],
+  "scope": "Facts.CaPolicies",
+  "where": "it.State == 'enabled' && it.Grant.RequireCompliantDevice",
+  "when": "it.ExcludedLocations.Any()",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} device compliance {Plural(Items.Count, 'policy is', 'policies are')} bypassed from trusted locations",
+    "columns": {
+      "Policy": "it.Name",
+      "Excluded locations": "it.ExcludedLocationNames"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Being on the corporate network is treated as evidence that a device is healthy, which it has not been for a long time. Any machine on that network, managed or not, is exempt.",
+    "remediation": [
+      "Remove the location exclusion and rely on device compliance regardless of where the device is.",
+      "Where a location exclusion is needed for a specific service, scope it to that service rather than to everything."
+    ]
+  }
+}

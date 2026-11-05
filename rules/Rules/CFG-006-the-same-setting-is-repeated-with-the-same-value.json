@@ -1,0 +1,38 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CFG-006",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CFG",
+  "title": "The same setting is repeated with the same value across several profiles",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles"
+  ],
+  "scope": "Facts.Derived.SettingOverlaps",
+  "when": "!it.HasConflictingValues && it.ProfileCount > 1",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'setting is', 'settings are')} duplicated across profiles",
+    "columns": {
+      "Setting": "it.SettingName",
+      "Profiles": "it.ProfileNames"
+    },
+    "exposure": "1",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "No harm today, but the next change has to be made in several places, and the day one place is missed the setting silently becomes a conflict.",
+    "remediation": [
+      "Keep each setting in one profile and remove the duplicates."
+    ]
+  },
+  "related": [
+    "CFG-005"
+  ]
+}

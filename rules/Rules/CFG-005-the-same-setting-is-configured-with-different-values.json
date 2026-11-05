@@ -1,0 +1,44 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CFG-005",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CFG",
+  "title": "The same setting is configured with different values in overlapping profiles",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles",
+    "Groups"
+  ],
+  "scope": "Facts.Derived.SettingOverlaps",
+  "when": "it.HasConflictingValues",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'setting is', 'settings are')} defined with different values in overlapping profiles",
+    "columns": {
+      "Setting": "it.SettingName",
+      "Profiles": "it.ProfileNames",
+      "Values": "it.Values",
+      "Devices affected": "it.DeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.DeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Which value a device ends up with depends on evaluation order rather than on anyone's intention, so the estate is not configured the way the console suggests.",
+    "remediation": [
+      "Decide which profile owns each setting listed and remove it from the others.",
+      "Prefer one profile per purpose over several profiles that each set a little of everything."
+    ]
+  },
+  "related": [
+    "CFG-003",
+    "CFG-006",
+    "SEC-026"
+  ]
+}

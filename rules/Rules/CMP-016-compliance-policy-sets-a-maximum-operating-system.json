@@ -1,0 +1,44 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-016",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "CMP",
+  "title": "Compliance policy sets a maximum operating system version",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CompliancePolicies"
+  ],
+  "scope": "Facts.CompliancePolicies",
+  "where": "it.Platform == 'Windows'",
+  "when": "it.MaximumOsVersion != null",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} compliance {Plural(Items.Count, 'policy caps', 'policies cap')} the Windows version a device may run",
+    "columns": {
+      "Policy": "it.Name",
+      "Maximum version": "it.MaximumOsVersion",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Select(i => i.TargetedDeviceCount).Sum(), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Every device that installs a Windows update past this version becomes non-compliant and loses access, so keeping machines up to date and keeping them working become opposing aims. The failure arrives silently, months after someone set the value.",
+    "technicalDetail": "The setting is Maximum OS version under the device properties of a Windows compliance policy. Intune does not warn when devices pass it.",
+    "remediation": [
+      "Remove the maximum version unless there is a named application that genuinely breaks above it.",
+      "Where one exists, record the reason and a date to review it, and hold those devices in a group of their own rather than capping the whole estate."
+    ],
+    "cannotSee": "Whether a maximum was set deliberately for an application that cannot run above it. The rule reports that the cap exists, not that it is wrong, and a tenant with a good reason should suppress it in the overrides file with that reason recorded."
+  },
+  "related": [
+    "CMP-004",
+    "CMP-005"
+  ]
+}

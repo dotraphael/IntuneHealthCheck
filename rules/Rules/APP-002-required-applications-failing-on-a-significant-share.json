@@ -1,0 +1,55 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-002",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "APP",
+  "title": "Required applications failing on a significant share of devices",
+  "type": "OperationalFailure",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Apps",
+    "AppInstallStatus"
+  ],
+  "scope": "Facts.Apps",
+  "where": "it.HasRequiredAssignment && it.TargetedDeviceCount > 0",
+  "when": "Pct(it.FailedCount, it.TargetedDeviceCount) > params.maxFailPct",
+  "params": {
+    "maxFailPct": {
+      "default": 5,
+      "range": [
+        0,
+        100
+      ],
+      "text": "Share of targets failing before the package is treated as broken"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} required {Plural(Items.Count, 'application is', 'applications are')} failing on more than {params.maxFailPct}% of devices",
+    "columns": {
+      "Application": "it.DisplayName",
+      "Failed": "it.FailedCount",
+      "Targeted": "it.TargetedDeviceCount",
+      "Failure rate": "Pct(it.FailedCount, it.TargetedDeviceCount)"
+    },
+    "exposure": "Share(Items.Sum(i => i.FailedCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Users do not have software the organisation has decided they need, and every failure is a potential service desk call that nobody has raised yet.",
+    "remediation": [
+      "Check the detection rule first, since a detection that never matches presents as a permanent failure.",
+      "Then check requirements and dependencies, and whether the installer needs a context the assignment does not give it."
+    ],
+    "cannotSee": "Counts come from Intune's install summary report, which can lag the devices by a day and counts devices rather than people. Where the report cannot be read this rule is skipped, because an application nobody counted is not one that failed nowhere."
+  },
+  "related": [
+    "APP-015",
+    "APP-016"
+  ]
+}

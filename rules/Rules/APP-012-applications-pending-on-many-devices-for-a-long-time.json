@@ -1,0 +1,60 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-012",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "APP",
+  "title": "Applications pending on many devices for a long time",
+  "type": "OperationalFailure",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Apps",
+    "AppInstallStatus"
+  ],
+  "scope": "Facts.Apps",
+  "where": "it.HasRequiredAssignment && it.TargetedDeviceCount > 0 && DaysSince(it.LastModified) > params.settledDays",
+  "when": "Pct(it.PendingCount, it.TargetedDeviceCount) > params.maxPendingPct",
+  "params": {
+    "maxPendingPct": {
+      "default": 10,
+      "range": [
+        0,
+        100
+      ],
+      "text": "Share still pending before delivery is stalled"
+    },
+    "settledDays": {
+      "default": 14,
+      "range": [
+        1,
+        90
+      ],
+      "text": "Days after assignment before pending stops being normal"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'application has', 'applications have')} not reached more than {params.maxPendingPct}% of their targets",
+    "columns": {
+      "Application": "it.DisplayName",
+      "Pending": "it.PendingCount",
+      "Targeted": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.PendingCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Neither installed nor failed, so nothing raises an alarm, while users continue not to have the software.",
+    "remediation": [
+      "Check whether the devices are checking in at all before investigating the packages."
+    ],
+    "cannotSee": "Counts come from Intune's install summary report, which can lag the devices by a day. A device offline since the assignment counts as pending however long it has been away. Where the report cannot be read this rule is skipped rather than finding nothing pending."
+  },
+  "related": [
+    "DEV-001"
+  ]
+}

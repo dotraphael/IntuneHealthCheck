@@ -1,0 +1,41 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CAD-005",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CAD",
+  "title": "No policy requires multi-factor authentication for privileged roles",
+  "type": "MissingCapability",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CaPolicies",
+    "EntraRoleAssignments"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.CaPolicies.Any(c => c.State == 'enabled' && c.Grant.RequireMfa && c.CoversPrivilegedRoles)",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "An administrator's password alone is enough to administer the tenant, which is the single most valuable credential an attacker can obtain here.",
+    "technicalDetail": "A policy counts when it is enabled, requires multi-factor authentication, and either names directory roles or targets all users. Naming the roles is the tidier way to write it, but a tenant that requires it of everyone has covered its administrators.",
+    "remediation": [
+      "Create a policy targeting directory roles, or the group holding them, requiring multi-factor authentication.",
+      "Exclude emergency access accounts and protect them another way."
+    ],
+    "cannotSee": "Who a policy excludes is not resolved against the people holding privileged roles, so a policy over all users counts even where an excluded group happens to hold an administrator. Excluding the emergency access accounts is expected and does not change the answer."
+  },
+  "frameworks": [
+    "CE:user-access-control"
+  ],
+  "related": [
+    "ACC-001",
+    "ACC-004"
+  ]
+}

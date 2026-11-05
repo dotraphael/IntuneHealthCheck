@@ -1,0 +1,51 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "APP-006",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "APP",
+  "title": "Frequently updated applications have not been repackaged",
+  "type": "BestPractice",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Apps"
+  ],
+  "scope": "Facts.Apps",
+  "when": "Ref.AppVersions.IsFrequentlyUpdated(it.DisplayName) && DaysSince(it.CreatedOn) > params.maxAgeDays",
+  "params": {
+    "maxAgeDays": {
+      "default": 180,
+      "range": [
+        30,
+        730
+      ],
+      "text": "Days before a frequently updated package is stale"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'application has', 'applications have')} not been repackaged for more than {params.maxAgeDays} days",
+    "columns": {
+      "Application": "it.DisplayName",
+      "Version": "it.Version",
+      "Packaged": "it.CreatedOn:d"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Applications such as browsers and runtimes publish security fixes monthly. A package six months old installs a version with known vulnerabilities on every new device.",
+    "remediation": [
+      "Repackage from the current release, or move the application to a source that updates itself."
+    ],
+    "cannotSee": "Requires the discovered applications inventory, which is out of scope for the first release. Ships disabled and is enabled when that collection area is added."
+  },
+  "related": [
+    "APP-007",
+    "APP-008"
+  ]
+}

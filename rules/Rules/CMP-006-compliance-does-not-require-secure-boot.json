@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CMP-006",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CMP",
+  "title": "Compliance does not require Secure Boot",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "CompliancePolicies"
+  ],
+  "scope": "Facts.CompliancePolicies",
+  "where": "it.Platform == 'Windows'",
+  "when": "it.RequireSecureBoot == false",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} compliance {Plural(Items.Count, 'policy does', 'policies do')} not require Secure Boot",
+    "columns": {
+      "Policy": "it.Name",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Without Secure Boot a device can be started from untrusted code, which undermines every protection that runs after start-up.",
+    "remediation": [
+      "Enable Require Secure Boot to be enabled on the device.",
+      "Expect a small number of older machines to fail; treat them as a replacement list."
+    ],
+    "cannotSee": "Compliance authored in the Settings Catalog is not read: this tool reads the typed compliance API, so a requirement set in a Settings Catalog compliance policy is invisible here and a tenant that has moved to them is judged only on what it left behind. Whether an unassigned policy is a draft or an oversight is also not visible, and the Assigned to column says which listed policies reach nobody."
+  },
+  "frameworks": [
+    "CE:secure-configuration"
+  ]
+}

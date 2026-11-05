@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "CFG-003",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "CFG",
+  "title": "Configuration profiles reporting conflicts",
+  "type": "OperationalFailure",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles"
+  ],
+  "scope": "Facts.ConfigurationProfiles",
+  "when": "it.ConflictCount > 0",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} configuration {Plural(Items.Count, 'profile is', 'profiles are')} in conflict on devices",
+    "columns": {
+      "Profile": "it.Name",
+      "Conflicts": "it.ConflictCount",
+      "Errors": "it.ErrorCount",
+      "Assigned to": "it.AssignedGroupNames"
+    },
+    "exposure": "Share(Items.Sum(i => i.ConflictCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Two policies are telling the same device different things, so neither setting is reliably in force and the outcome varies by device.",
+    "remediation": [
+      "Identify the setting in conflict and decide which policy owns it.",
+      "Remove the setting from the other policies rather than changing its value, so ownership is unambiguous."
+    ]
+  },
+  "related": [
+    "CFG-005",
+    "CFG-004"
+  ]
+}

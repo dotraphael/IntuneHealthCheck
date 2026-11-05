@@ -1,0 +1,47 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "HYG-003",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "HYG",
+  "title": "Assignment filters are not used",
+  "type": "MissingCapability",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.ConfigurationProfiles.Count() > params.minProfiles",
+  "requires": [
+    "Filters",
+    "ConfigurationProfiles"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.Filters.Any()",
+  "params": {
+    "minProfiles": {
+      "default": 10,
+      "range": [
+        1,
+        1000
+      ],
+      "text": "Profiles above which filters start to save real work"
+    }
+  },
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Every variation in targeting needs its own group, so the group list grows faster than the policy list and nobody can say what a device will receive.",
+    "remediation": [
+      "Create filters for the common distinctions, such as operating system version, ownership and device naming.",
+      "Apply them to existing assignments rather than creating more groups."
+    ],
+    "cannotSee": "Whether assignment filters would help depends on how the estate is targeted. A tenant whose groups already express what a filter would express has the same control by another route, and this cannot tell that apart from a tenant that has never considered filters."
+  },
+  "related": [
+    "HYG-004"
+  ]
+}

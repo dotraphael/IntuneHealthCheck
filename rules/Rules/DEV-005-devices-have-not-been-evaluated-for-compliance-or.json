@@ -1,0 +1,54 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "DEV-005",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "DEV",
+  "title": "Devices have not been evaluated for compliance, or are in grace",
+  "type": "OperationalFailure",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Devices"
+  ],
+  "scope": "Facts.Devices",
+  "where": "it.IsWindows",
+  "when": "it.ComplianceState == 'unknown' || it.ComplianceState == 'inGracePeriod'",
+  "raiseWhen": "Pct(Items.Count, Scoped.Count) > params.maxUnknownPct",
+  "params": {
+    "maxUnknownPct": {
+      "default": 5,
+      "range": [
+        0,
+        100
+      ],
+      "text": "Share unevaluated before compliance reporting stops being trustworthy"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Windows {Plural(Items.Count, 'device has', 'devices have')} no compliance verdict",
+    "columns": {
+      "Device": "it.Name",
+      "State": "it.ComplianceState",
+      "Last check-in": "it.LastSync:d"
+    },
+    "exposure": "Share(Items.Count, Scoped.Count)",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "Compliance figures quoted to leadership exclude these devices, so the reported position is better than the real one.",
+    "remediation": [
+      "Check they are targeted by a compliance policy and are checking in.",
+      "Devices in grace need the grace period reviewed, since a long one hides failures."
+    ],
+    "cannotSee": "Whether a device has no verdict because it is new, because it is targeted by no policy, or because it has stopped checking in is not distinguished here. CMP-014 asks the second question directly."
+  },
+  "related": [
+    "CMP-014",
+    "DEV-001"
+  ]
+}

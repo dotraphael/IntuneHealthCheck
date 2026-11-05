@@ -1,0 +1,44 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "HYG-010",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "HYG",
+  "title": "Objects have no scope tag where scope tags are in use",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.ScopeTags.Count() > 1",
+  "requires": [
+    "ScopeTags",
+    "ConfigurationProfiles",
+    "Apps"
+  ],
+  "scope": "Facts.Derived.Assignables",
+  "when": "it.ScopeTagsKnown && it.OnlyDefaultScopeTag",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'object carries', 'objects carry')} only the default scope tag",
+    "columns": {
+      "Object": "it.Name",
+      "Type": "it.ObjectType",
+      "Scope tags": "it.ScopeTagSummary"
+    },
+    "exposure": "1",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "The delegation model has gaps: these objects are visible to every administrator regardless of the boundaries the scope tags were created to enforce.",
+    "remediation": [
+      "Apply the appropriate scope tag to each object, and remember the role assignment needs the same tag."
+    ],
+    "cannotSee": "Whether the default tag is wrong for an object is a judgement about how the tenant has divided its administration, which this cannot make: it reports that the object sits outside the division rather than that it should not. The tag is matched by identifier rather than by name, so a tenant that renamed its default tag is still read correctly, and an object whose tags this run could not read is passed over rather than reported as untagged."
+  },
+  "related": [
+    "TEN-009",
+    "ACC-007"
+  ]
+}

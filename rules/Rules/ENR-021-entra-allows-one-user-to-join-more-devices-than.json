@@ -1,0 +1,44 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-021",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ENR",
+  "title": "Entra allows one user to join more devices than intended",
+  "type": "Misconfiguration",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EntraDeviceSettings"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.EntraDeviceSettings.MaxDevicesPerUser > params.maxDevices",
+  "params": {
+    "maxDevices": {
+      "default": 20,
+      "range": [
+        1,
+        100
+      ],
+      "text": "Devices one user may join before the limit stops being a limit"
+    }
+  },
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "One account may join {Facts.EntraDeviceSettings.MaxDevicesPerUserSummary} devices to the directory, more machines than any person uses, so device sprawl and the licence consumption that follows go unnoticed.",
+    "remediation": [
+      "Set Maximum number of devices per user, in the Entra device settings, to a number matching real use. It is {Facts.EntraDeviceSettings.MaxDevicesPerUserSummary} today and this rule reports anything above {params.maxDevices}."
+    ],
+    "cannotSee": "Entra records no limit as the largest number it can hold, which the console shows as Unlimited and which this reports in the same word rather than as the number. This is the directory's join quota, set in the Entra device settings, and not the Intune enrolment restriction that ENR-012 reads. The two are separate numbers on separate pages and a tenant can have one set sensibly and the other not, so a finding here says nothing about that one. What number suits an organisation is a judgement this cannot make; the threshold is a parameter for that reason."
+  },
+  "related": [
+    "ENR-012"
+  ]
+}

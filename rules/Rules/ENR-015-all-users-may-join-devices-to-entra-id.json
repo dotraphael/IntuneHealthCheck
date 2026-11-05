@@ -1,0 +1,37 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-015",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ENR",
+  "title": "All users may join devices to Entra ID",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EntraDeviceSettings"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.EntraDeviceSettings.JoinScope == 'All'",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Any user can bring a machine under the organisation's identity, which is how unmanaged and unpatched devices end up holding company data.",
+    "remediation": [
+      "Under Entra device settings, change Users may join devices to Selected and name the group that provisions machines, rather than leaving it at All.",
+      "Put the people who actually build devices in that group. User-driven Autopilot still works for them, and nobody else can bring a machine under the organisation's identity.",
+      "None blocks Entra join outright, which breaks Autopilot, so a subset is the setting to aim at rather than the other extreme."
+    ],
+    "cannotSee": "Who may join is read from the directory's own device registration policy. Whether the people it names should be allowed to join is a judgement this cannot make; what it reports is that the tenant has not narrowed it at all."
+  },
+  "related": [
+    "ENR-016",
+    "ENR-017"
+  ]
+}

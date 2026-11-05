@@ -1,0 +1,51 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SCR-005",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SCR",
+  "title": "Remediation detection is failing",
+  "type": "OperationalFailure",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Remediations"
+  ],
+  "scope": "Facts.Remediations",
+  "where": "it.StatusKnown && it.TargetedDeviceCount > 0",
+  "when": "Pct(it.DetectionFailedCount, it.TargetedDeviceCount) > params.maxFailPct",
+  "params": {
+    "maxFailPct": {
+      "default": 5,
+      "range": [
+        0,
+        100
+      ],
+      "text": "Share where detection errors before the remediation is unreliable"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'remediation has', 'remediations have')} failing detection on more than {params.maxFailPct}% of devices",
+    "columns": {
+      "Remediation": "it.Name",
+      "Detection failures": "it.DetectionFailedCount",
+      "Targeted": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.DetectionFailedCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The remediation cannot tell whether the problem exists, so it neither fixes nor reports. The condition it was written for is unmeasured.",
+    "remediation": [
+      "Check the detection script's exit codes, since anything other than the expected values is treated as an error."
+    ],
+    "cannotSee": "A detection failure is counted, not explained: a script erroring on every device and one erroring on the few that lack something it expects look the same here. Devices that have not yet run the current version of the script are not counted at all, so a remediation published this week is judged on whoever has run it. A remediation whose run summary this run could not read is passed over rather than reported as healthy."
+  },
+  "related": [
+    "SCR-006"
+  ]
+}

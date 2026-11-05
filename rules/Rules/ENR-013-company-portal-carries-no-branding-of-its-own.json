@@ -1,0 +1,35 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-013",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ENR",
+  "title": "Company Portal carries no branding of its own",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Tenant"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.Tenant.BrandingKnown && !Facts.Tenant.BrandingConfigured",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Users are asked to hand a device to a portal that shows them no name they recognise and no one to ask, which is the most common reason an enrolment is abandoned or raised with the service desk instead.",
+    "remediation": [
+      "Fill in the organisation's name, logo, support contact and privacy statement under Tenant administration, Customization.",
+      "The default profile counts once it carries these; a tenant that has left it empty is what this reports."
+    ],
+    "cannotSee": "Every tenant is given a default branding profile whether or not anyone has filled it in, so existence proves nothing and what is read is whether the name, the support contact or the privacy statement carries anything. A profile somebody made themselves counts whatever it holds, since making it was the deliberate act. Whether what is there is accurate, or points at addresses that still answer, is not checked, and a run that could read neither the brand nor the profiles reports nothing at all rather than reporting the tenant unbranded."
+  },
+  "related": [
+    "ENR-023"
+  ]
+}

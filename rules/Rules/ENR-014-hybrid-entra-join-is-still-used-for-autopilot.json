@@ -1,0 +1,38 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-014",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ENR",
+  "title": "Hybrid Entra join is still used for Autopilot",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Large",
+  "requires": [
+    "AutopilotProfiles"
+  ],
+  "scope": "Facts.AutopilotProfiles",
+  "when": "it.JoinType == 'HybridAzureADJoin'",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Autopilot {Plural(Items.Count, 'profile uses', 'profiles use')} hybrid join",
+    "columns": {
+      "Profile": "it.Name",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Provisioning depends on line of sight to a domain controller, so a new starter working from home cannot be provisioned without a VPN, and the process carries failure modes that cloud join does not have.",
+    "remediation": [
+      "Plan a move to Entra join for new devices, keeping hybrid only for applications that genuinely require domain authentication.",
+      "Treat this as a project rather than a setting change."
+    ],
+    "cannotSee": "Hybrid join may be deliberate, since an estate with on-premises resources that need a domain-joined machine has a reason for it. What this cannot see is whether those dependencies still exist, which is the question worth asking rather than the setting itself."
+  }
+}

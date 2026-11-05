@@ -1,0 +1,55 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-005",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ENR",
+  "title": "Enrollment Status Page timeout is outside the sensible range",
+  "type": "Misconfiguration",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EnrolmentConfigs"
+  ],
+  "scope": "Facts.EnrolmentConfigs",
+  "where": "it.Type == 'EnrollmentStatusPage' && it.BlockUntilComplete",
+  "when": "it.TimeoutMinutes < params.minMinutes || it.TimeoutMinutes > params.maxMinutes",
+  "params": {
+    "maxMinutes": {
+      "default": 120,
+      "range": [
+        30,
+        720
+      ],
+      "text": "Above this, a stuck device looks like a working one"
+    },
+    "minMinutes": {
+      "default": 30,
+      "range": [
+        5,
+        240
+      ],
+      "text": "Below this, slow networks time out unnecessarily"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Enrollment Status Page {Plural(Items.Count, 'profile has', 'profiles have')} an unhelpful timeout",
+    "columns": {
+      "Profile": "it.Name",
+      "Timeout": "it.TimeoutMinutes"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Too short and provisioning fails on a slow connection; too long and a genuinely stuck device holds a new starter at a progress screen for hours.",
+    "remediation": [
+      "Set the timeout between 30 and 120 minutes, judged against how long a full provisioning takes on the slowest site."
+    ],
+    "cannotSee": "The timeout is judged against a range rather than against how long this tenant's own provisioning actually takes, which is not something a read-only run can measure. A tenant that has timed its build and set the value deliberately will be reported here."
+  }
+}

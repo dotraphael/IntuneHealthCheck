@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-020",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ENR",
+  "title": "Autopilot profile makes the user a local administrator",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "AutopilotProfiles"
+  ],
+  "scope": "Facts.AutopilotProfiles",
+  "when": "it.UserAccountType == 'Administrator'",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Autopilot {Plural(Items.Count, 'profile makes', 'profiles make')} the user a local administrator",
+    "columns": {
+      "Profile": "it.Name",
+      "Assigned to": "it.AssignmentSummary",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.TargetedDeviceCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Every device provisioned by these profiles hands its user administrative rights, regardless of what the directory settings say.",
+    "technicalDetail": "The Entra device setting governs manual joins only. For Autopilot, the profile's user account type decides, so a tenant can look correct in one place and not the other.",
+    "remediation": [
+      "Set the user account type to Standard on each profile listed.",
+      "Provide elevation through a named process for the cases that need it."
+    ],
+    "cannotSee": "Only the account type the profile sets is read. Whether a configuration or endpoint security policy afterwards removes the user from the administrators group, which is a common pairing, is not visible to this rule."
+  },
+  "related": [
+    "ENR-019"
+  ]
+}

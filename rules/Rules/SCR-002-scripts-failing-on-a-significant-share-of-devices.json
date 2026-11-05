@@ -1,0 +1,53 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SCR-002",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SCR",
+  "title": "Scripts failing on a significant share of devices",
+  "type": "OperationalFailure",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Scripts"
+  ],
+  "scope": "Facts.Scripts",
+  "where": "it.TargetedDeviceCount > 0",
+  "when": "Pct(it.FailedCount, it.TargetedDeviceCount) > params.maxFailPct",
+  "params": {
+    "maxFailPct": {
+      "default": 5,
+      "range": [
+        0,
+        100
+      ],
+      "text": "Share failing before the script is treated as broken"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'script is', 'scripts are')} failing on more than {params.maxFailPct}% of devices",
+    "columns": {
+      "Script": "it.Name",
+      "Failed": "it.FailedCount",
+      "Targeted": "it.TargetedDeviceCount",
+      "Run as": "it.RunAsAccount"
+    },
+    "exposure": "Share(Items.Sum(i => i.FailedCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Whatever the script was configuring is not configured on those devices, and because scripts run once by default, a failure is often permanent.",
+    "remediation": [
+      "Check the run-as context first, since scripts written for system that run as user, or the reverse, fail consistently.",
+      "Consider converting the script to a remediation, which retries."
+    ],
+    "cannotSee": "A failure is counted, not explained. A script that fails by design on devices it does not apply to, because nothing tells it to stop early, is counted as failing on every one of them. The counts are Intune's current summary rather than a history, so a script fixed this morning still reads as failing until the devices report again, and devices that have never run it are not counted at all."
+  },
+  "related": [
+    "SCR-011"
+  ]
+}

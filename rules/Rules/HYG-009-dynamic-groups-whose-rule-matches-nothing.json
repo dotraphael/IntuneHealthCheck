@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "HYG-009",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "HYG",
+  "title": "Dynamic groups whose rule matches nothing",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Groups"
+  ],
+  "scope": "Facts.Groups",
+  "when": "it.IsDynamic && it.MemberCountKnown && it.MemberCount == 0",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} dynamic {Plural(Items.Count, 'group matches', 'groups match')} no members",
+    "columns": {
+      "Group": "it.Name",
+      "Rule": "it.MembershipRule",
+      "Created": "it.CreatedOn:d"
+    },
+    "exposure": "1",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "A rule referencing a property that is no longer populated matches nothing and reports no error, so the group quietly empties and everything targeting it stops applying.",
+    "remediation": [
+      "Test each rule against a device that should match, checking the property names and values it depends on."
+    ],
+    "cannotSee": "Only that the rule matches nobody today is read, not why. A rule written for hardware not yet bought, or for a property Intune fills in later, matches nothing now and will match later, and reads here exactly like a rule with a mistake in it. Entra also takes time to evaluate a rule that has just been changed. A group whose membership this run could not read is passed over rather than reported."
+  },
+  "related": [
+    "HYG-005"
+  ]
+}

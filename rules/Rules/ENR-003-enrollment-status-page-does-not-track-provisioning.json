@@ -1,0 +1,44 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-003",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ENR",
+  "title": "Enrollment Status Page does not track provisioning progress",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EnrolmentConfigs"
+  ],
+  "scope": "Facts.EnrolmentConfigs",
+  "where": "it.Type == 'EnrollmentStatusPage'",
+  "when": "!it.ShowProgress",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Enrollment Status Page {Plural(Items.Count, 'profile does', 'profiles do')} not hold the device until provisioning completes",
+    "columns": {
+      "Profile": "it.Name",
+      "Shows progress": "it.ShowProgress",
+      "Allows use after an error": "it.AllowUseOnFailure",
+      "Assigned to": "it.AssignmentSummary"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Users reach the desktop before applications and policies have arrived, so a device that is not ready looks ready. The support calls that follow are indistinguishable from real faults.",
+    "remediation": [
+      "Enable Show app and profile configuration progress.",
+      "Block device use until required apps are installed, listing only the applications genuinely needed on day one."
+    ],
+    "cannotSee": "The console's Block device use until all apps and profiles are installed has no property in Graph that this tool has identified, so a page that tracks progress is taken to hold the device, which is what Intune does. A tenant that has somehow tracked progress without blocking is therefore not reported here. Whether the applications the page waits for are the right ones is ENR-004's question, not this one."
+  },
+  "related": [
+    "ENR-004",
+    "ENR-005"
+  ]
+}

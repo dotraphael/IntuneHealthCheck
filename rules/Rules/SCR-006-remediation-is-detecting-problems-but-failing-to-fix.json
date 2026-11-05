@@ -1,0 +1,53 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SCR-006",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SCR",
+  "title": "Remediation is detecting problems but failing to fix them",
+  "type": "OperationalFailure",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Remediations"
+  ],
+  "scope": "Facts.Remediations",
+  "where": "it.StatusKnown && it.AttemptedCount > 0",
+  "when": "Pct(it.UnresolvedCount, it.AttemptedCount) > params.maxFailPct",
+  "params": {
+    "maxFailPct": {
+      "default": 10,
+      "range": [
+        0,
+        100
+      ],
+      "text": "Share of detected issues left unfixed before the remediation is ineffective"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'remediation is', 'remediations are')} failing to fix what they find",
+    "columns": {
+      "Remediation": "it.Name",
+      "Detected": "it.IssueDetectedCount",
+      "Fixed": "it.IssueRemediatedCount",
+      "Not fixed": "it.UnresolvedCount",
+      "Not run": "it.RemediationSkippedCount"
+    },
+    "exposure": "Share(Items.Sum(i => i.UnresolvedCount), Facts.Devices.WindowsCount)",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The problem is known, reported and untreated, which is worse than not looking, because the report suggests something is being done.",
+    "remediation": [
+      "Check the run-as context and whether the fix needs rights the script does not have."
+    ],
+    "cannotSee": "What is counted as unfixed is worked out from what Intune says it fixed, rather than from the counts Graph keeps of remediations that errored or changed nothing: the fixed figure is the one the console shows an administrator, so this agrees with the screen they are looking at. The consequence is that a device between running the repair and reporting the result is counted as unfixed until it reports, so a remediation assigned this morning can appear here and be gone by tomorrow. The detected count divides every device by what detection found, and a device Intune has since fixed is still counted there, which is why the share is worked out against the devices the repair was actually run on. A device the repair was never run on, which is what an assignment set to detect only produces, is taken out of both. Why a repair failed is not read, and whether detection was right about there being a problem is not visible: a detection script that is too eager makes work for a repair script that cannot succeed."
+  },
+  "related": [
+    "SCR-005"
+  ]
+}

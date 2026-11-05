@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SCR-004",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SCR",
+  "title": "Script downloads or executes remote content insecurely",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "Scripts",
+    "Remediations"
+  ],
+  "scope": "Facts.Derived.AllScripts",
+  "where": "it.ContentKnown && !it.IsMicrosoftAuthored",
+  "when": "Ref.Patterns.AnyMatch(it.Content, \"insecureDownload\")",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'script fetches', 'scripts fetch')} remote content insecurely",
+    "columns": {
+      "Script": "it.Name",
+      "Type": "it.ObjectType",
+      "Pattern": "Ref.Patterns.Describe(it.Content, \"insecureDownload\")"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Code is fetched over an unencrypted connection or from a location outside the organisation's control, then run with system rights on managed devices.",
+    "remediation": [
+      "Move the content to a location the organisation controls and fetch it over HTTPS.",
+      "Verify a hash or signature before executing anything downloaded."
+    ],
+    "cannotSee": "What the script fetches is not read, only that it fetches over plain HTTP or runs what it downloads. A download from a server inside the organisation over a network nobody else reaches carries less risk than the same line pointing at the internet, and this cannot tell them apart. A script whose content this run could not read is passed over rather than cleared, and a script Microsoft publishes is passed over too."
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "DEV-003",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "DEV",
+  "title": "Duplicate device records",
+  "type": "Hygiene",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Devices"
+  ],
+  "scope": "Facts.Derived.DuplicateDevices",
+  "when": "it.DuplicateCount > 1",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'device appears', 'devices appear')} more than once",
+    "columns": {
+      "Device": "it.Name",
+      "Records": "it.DuplicateCount",
+      "Most recent": "it.NewestLastSync:d",
+      "Oldest": "it.OldestLastSync:d"
+    },
+    "exposure": "Share(Items.Count, Facts.Devices.WindowsCount)",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "Reporting counts the same machine several times, and a stale duplicate can show as non-compliant while the live record is healthy, so investigations start in the wrong place.",
+    "remediation": [
+      "Remove the stale records, keeping the one that is checking in.",
+      "Duplicates usually come from rebuilds without retirement, so review the rebuild process."
+    ],
+    "cannotSee": "Duplicates are matched on the device name, so two genuinely different machines built with the same name are counted as one record twice over, and a rebuild that changed the name is not matched at all."
+  },
+  "related": [
+    "DEV-010"
+  ]
+}

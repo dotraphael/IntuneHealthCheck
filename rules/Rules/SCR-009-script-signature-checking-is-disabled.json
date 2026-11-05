@@ -1,0 +1,44 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SCR-009",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SCR",
+  "title": "Script signature checking is disabled",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Scripts",
+    "Remediations"
+  ],
+  "scope": "Facts.Derived.AllScripts",
+  "where": "it.Assignments.Any() && !it.IsMicrosoftAuthored",
+  "when": "!it.EnforceSignatureCheck",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'script runs', 'scripts run')} without a signature check",
+    "columns": {
+      "Script": "it.Name",
+      "Type": "it.ObjectType",
+      "Run as": "it.RunAsAccount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Unsigned code runs with system rights on managed devices, so anyone able to change the script in the tenant can run anything they like on the estate.",
+    "remediation": [
+      "Sign scripts with a code-signing certificate, put the certificate in Trusted Publishers on the devices, and enable signature checking.",
+      "Expect this to be off across the estate: Microsoft's own deployment steps for a remediation package set it to No, so treat it as hardening to plan rather than a mistake to correct."
+    ],
+    "cannotSee": "Whether the script is signed is not read, only whether Intune was told to insist. A tenant that signs every script and leaves the check off is in a better position than this suggests, and a tenant with the check on is only as safe as the certificates its devices trust. Microsoft's own instructions for creating a remediation package set this to No, so a tenant that followed them is reported here for having done as it was told, which is why this is Low. The script packages Microsoft publishes are passed over: they are signed whatever the setting says, and nobody in the tenant can change the setting anyway. The setting binds the script Intune delivers and says nothing about what the script then runs."
+  },
+  "related": [
+    "SCR-010",
+    "SCR-011"
+  ]
+}

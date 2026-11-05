@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "DEV-010",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "DEV",
+  "title": "Entra device records with no Intune record",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Devices",
+    "EntraDevices"
+  ],
+  "scope": "Facts.Derived.DeviceRecords",
+  "where": "it.IsWindows",
+  "when": "it.HasEntraRecord && !it.HasIntuneRecord",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Entra {Plural(Items.Count, 'device has', 'devices have')} no Intune record",
+    "columns": {
+      "Device": "it.Name",
+      "Join type": "it.JoinType",
+      "Last activity": "it.LastActivity:d"
+    },
+    "exposure": "1",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "These machines hold a directory identity and may hold access, while being managed by nothing.",
+    "remediation": [
+      "Establish whether they should be enrolled, and enrol or remove them accordingly."
+    ],
+    "cannotSee": "Both lists are matched on the Entra device identifier, so an Intune record that carries none is left out rather than counted as orphaned. Why a machine holds a directory identity and no Intune record is not visible: it may never have enrolled, may have been retired from Intune while its directory record stayed, or may be managed by something else entirely. Entra reports the last sign-in approximately and sometimes not at all, so an empty activity column is an unknown rather than a device nobody has used."
+  },
+  "related": [
+    "DEV-003"
+  ]
+}

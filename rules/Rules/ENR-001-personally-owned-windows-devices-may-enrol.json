@@ -1,0 +1,44 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-001",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ENR",
+  "title": "Personally owned Windows devices may enrol",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EnrolmentConfigs"
+  ],
+  "scope": "Facts.EnrolmentConfigs",
+  "where": "it.Type == 'PlatformRestriction'",
+  "when": "!it.PlatformRestrictions.Windows.Blocked && it.PlatformRestrictions.Windows.PersonalAllowed",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} enrolment {Plural(Items.Count, 'restriction allows', 'restrictions allow')} personal Windows devices",
+    "columns": {
+      "Restriction": "it.Name",
+      "Assigned to": "it.AssignmentSummary",
+      "Priority": "it.Priority"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Personal machines can enrol and receive company policy and data, on hardware the organisation does not own and cannot dispose of securely.",
+    "remediation": [
+      "Block personal Windows enrolment in the platform restriction.",
+      "Register corporate device identifiers, or use Autopilot, so company devices are recognised automatically.",
+      "If personal access is intended, deliver it through app protection rather than device enrolment."
+    ],
+    "cannotSee": "A restriction blocking Windows outright is passed over, since what it says about personal ownership cannot be reached. Beyond that, whether personal Windows enrolment is wanted is a decision rather than a fault: an organisation running a bring-your-own scheme has chosen it. Only the restriction is read, not what has enrolled through it, so one permitting personal devices nobody has used reads the same as one being used daily. Which restriction wins for a given user is decided by priority, which the evidence names but this does not weigh."
+  },
+  "related": [
+    "ENR-003",
+    "DEV-009"
+  ]
+}

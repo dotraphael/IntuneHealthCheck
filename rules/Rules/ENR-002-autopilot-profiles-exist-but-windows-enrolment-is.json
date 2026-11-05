@@ -1,0 +1,33 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-002",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ENR",
+  "title": "Autopilot profiles exist but Windows enrolment is blocked",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EnrolmentConfigs",
+    "AutopilotProfiles"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.AutopilotProfiles.Any() && Facts.EnrolmentConfigs.Any(c => c.Type == 'PlatformRestriction' && c.PlatformRestrictions.Windows.Blocked)",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Provisioning will fail at the point a new starter first switches on their laptop, which is the most visible failure in the whole service.",
+    "remediation": [
+      "Correct the platform restriction so corporate Windows enrolment is permitted.",
+      "Check the restriction's priority, since a lower priority policy can be overridden by a higher one."
+    ],
+    "cannotSee": "Only whether a Windows platform restriction blocks enrolment is read, not the order the restrictions apply in. A tenant whose blocking entry is overridden by a higher priority one for the groups that matter is reported here all the same, and the priority column is what tells them apart."
+  }
+}

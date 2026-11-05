@@ -1,0 +1,43 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SCR-001",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "SCR",
+  "title": "Scripts and remediations with no assignment",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Scripts",
+    "Remediations"
+  ],
+  "scope": "Facts.Derived.AllScripts",
+  "where": "!it.IsMicrosoftAuthored",
+  "when": "!it.Assignments.Any()",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'script is', 'scripts are')} not assigned",
+    "columns": {
+      "Script": "it.Name",
+      "Type": "it.ObjectType",
+      "Created": "it.CreatedOn:d",
+      "Run as": "it.RunAsAccount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Code sitting in the tenant that runs nowhere. Each one is either abandoned or a control someone believes is in place.",
+    "remediation": [
+      "Assign or delete. Deleting is usually right, since an unassigned script has no history to lose."
+    ],
+    "cannotSee": "Only whether the object carries an assignment is read, not whether anybody meant it to. A script kept unassigned on purpose, as a draft or as something run by hand during a build, reads the same as one somebody forgot. The script packages Microsoft publishes are passed over: every tenant has them, they arrive unassigned, and a tenant that has not assigned one has done nothing. A remediation can also be run on one device on demand without ever being assigned, which leaves no trace this can see. Nothing is read about what the script does, so an unassigned script that would be harmful if assigned is reported no differently from a harmless one."
+  },
+  "related": [
+    "SCR-012"
+  ]
+}

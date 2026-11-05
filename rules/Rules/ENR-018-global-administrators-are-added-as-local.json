@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-018",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ENR",
+  "title": "Global Administrators are added as local administrators on joined devices",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EntraDeviceSettings"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.EntraDeviceSettings.GlobalAdminsAreLocalAdmins",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Every Global Administrator holds local administrator rights on every joined device. A single account compromise becomes administrative access to the entire estate rather than to the tenant alone.",
+    "remediation": [
+      "Turn off the setting that adds Global Administrator to the local administrators group.",
+      "Use the Device Administrator role for the small number of people who genuinely need it, or Endpoint Privilege Management for elevation on demand."
+    ],
+    "cannotSee": "Whether the global administrators on this tenant should be local administrators on every joined device is a judgement. What is visible is only that the setting is on; who holds the role, and how many of them there are, is ACC-001's question."
+  },
+  "frameworks": [
+    "CE:user-access-control"
+  ],
+  "related": [
+    "ENR-019",
+    "SEC-019"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-006",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ENR",
+  "title": "Autopilot profile has no assignment",
+  "type": "Hygiene",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "AutopilotProfiles"
+  ],
+  "scope": "Facts.AutopilotProfiles",
+  "when": "!it.Assignments.Any()",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Autopilot {Plural(Items.Count, 'profile is', 'profiles are')} not assigned",
+    "columns": {
+      "Profile": "it.Name",
+      "Join type": "it.JoinType",
+      "Modified": "it.LastModified:d"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The profile does nothing. If it was meant to be the standard build, devices are being provisioned without it.",
+    "remediation": [
+      "Assign the profile to the group holding Autopilot devices, or delete it."
+    ],
+    "cannotSee": "Whether a profile was left unassigned deliberately, as a draft or a template, or by mistake, is not visible. An unassigned profile provisions nothing either way."
+  },
+  "related": [
+    "ENR-007",
+    "ENR-008"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-019",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ENR",
+  "title": "The registering user is made a local administrator",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EntraDeviceSettings"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.EntraDeviceSettings.RegisteringUserIsLocalAdmin",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Whoever sets up a device ends up owning it administratively, so users can disable protections, install anything, and defeat most of the controls configured elsewhere. The directory grants this to {Facts.EntraDeviceSettings.RegisteringUserLocalAdminScope} of the users who register a device.",
+    "remediation": [
+      "Under Entra device settings, set Local administrator on Microsoft Entra joined devices to None for registering users. It is {Facts.EntraDeviceSettings.RegisteringUserLocalAdminScope} today.",
+      "Where elevation is genuinely needed, name those people rather than granting it to whoever happens to unbox the machine, and prefer providing it on request over providing it permanently."
+    ],
+    "cannotSee": "This is reported wherever the grant reaches anybody, so a directory naming a few people is reported alongside one granting it to all; the scope in the message is what tells them apart. The grant applies to registrations made after it was set, so devices joined earlier keep whatever they were given and this says nothing about them. Whether a configuration policy afterwards removes the right, which is a common pairing, is not visible here either."
+  },
+  "frameworks": [
+    "CE:user-access-control"
+  ],
+  "related": [
+    "ENR-018",
+    "ENR-020"
+  ]
+}

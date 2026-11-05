@@ -1,0 +1,64 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "DEV-001",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "DEV",
+  "title": "Devices have not checked in recently",
+  "type": "Hygiene",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Devices"
+  ],
+  "scope": "Facts.Devices",
+  "where": "it.IsWindows",
+  "when": "DaysSince(it.LastSync) > params.staleDays",
+  "raiseWhen": "Pct(Items.Count, Scoped.Count) > params.maxStalePct",
+  "params": {
+    "maxStalePct": {
+      "default": 5,
+      "range": [
+        0,
+        100
+      ],
+      "text": "Share of the estate before this is worth reporting"
+    },
+    "staleDays": {
+      "default": 30,
+      "range": [
+        7,
+        180
+      ],
+      "text": "Days without contact before a device is treated as stale"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Windows {Plural(Items.Count, 'device has', 'devices have')} not checked in for more than {params.staleDays} days",
+    "columns": {
+      "Device": "it.Name",
+      "Last check-in": "it.LastSync:d",
+      "Primary user": "it.PrimaryUser",
+      "OS build": "it.OsVersion"
+    },
+    "exposure": "Share(Items.Count, Scoped.Count)",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "No policy, no update and no compliance evaluation is reaching these devices. Depending on the tenant settings they may still be counted as compliant and still hold valid access.",
+    "remediation": [
+      "Establish whether they are decommissioned, in storage, or genuinely in use and failing to connect.",
+      "Enable a cleanup rule so decommissioned devices are removed automatically rather than accumulating."
+    ],
+    "cannotSee": "How long a device may be quiet before it matters depends on how the organisation works: a machine in a drawer between projects and one that has failed to connect look identical here. Only the last check-in Intune records is read, so a device talking to Entra but not to Intune reads as silent."
+  },
+  "related": [
+    "DEV-002",
+    "HYG-001",
+    "CFG-011"
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "HYG-014",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 3,
+  "domain": "HYG",
+  "title": "Assignments use exclude filters but never include filters",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "Medium",
+  "effort": "Medium",
+  "applies": "Facts.Filters.Any()",
+  "requires": [
+    "Filters",
+    "AssignmentListsComplete",
+    "ConfigurationProfiles",
+    "EndpointSecurityPolicies",
+    "CompliancePolicies",
+    "Apps",
+    "Baselines",
+    "Scripts",
+    "Remediations",
+    "UpdateRings",
+    "QualityUpdatePolicies",
+    "DriverUpdatePolicies",
+    "EnrolmentConfigs",
+    "AutopilotProfiles"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.Derived.Assignables.Any(o => o.Assignments.Any(a => a.FilterId != null && a.FilterMode == 'exclude')) && !Facts.Derived.Assignables.Any(o => o.Assignments.Any(a => a.FilterId != null && a.FilterMode == 'include'))",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25,
+    "table": {
+      "source": "Facts.Derived.Assignables.Where(o => o.Assignments.Any(a => a.FilterId != null && a.FilterMode == 'exclude'))",
+      "columns": {
+        "Object": "it.Name",
+        "Type": "it.ObjectType",
+        "Assigned to": "it.AssignmentSummary"
+      }
+    }
+  },
+  "messages": {
+    "businessImpact": "Filters exist only as carve-outs from broad assignments, which usually means All Devices or All Users is doing the real targeting and exclusions are accumulating unpaid debt.",
+    "remediation": [
+      "Prefer include filters that describe the intended population, and shrink the underlying group or All-target assignments."
+    ],
+    "cannotSee": "The filter list and every supported assignable workload must be collected, or this check skips rather than calling a tenant one that never includes. A tenant using include filters only on a workload outside that list is not credited. Whether a filter is correct is CFG-014, CFG-015 and HYG-013."
+  },
+  "related": [
+    "HYG-003",
+    "HYG-004",
+    "CFG-014"
+  ]
+}

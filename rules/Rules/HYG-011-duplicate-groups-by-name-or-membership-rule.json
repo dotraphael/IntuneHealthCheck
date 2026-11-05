@@ -1,0 +1,37 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "HYG-011",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 3,
+  "domain": "HYG",
+  "title": "Duplicate groups by name or membership rule",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "Groups"
+  ],
+  "scope": "Facts.Derived.DuplicateGroups",
+  "when": "it.DuplicateCount > 1",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'group appears', 'groups appear')} to duplicate another",
+    "columns": {
+      "Groups": "it.GroupNames",
+      "Reason": "it.Reason",
+      "Members": "it.MemberCount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Two groups meaning the same thing drift apart, and assignments split between them so a change reaches only half the intended population.",
+    "remediation": [
+      "Consolidate onto one group and retarget the assignments before deleting the other."
+    ],
+    "cannotSee": "Duplication is judged on the name and the membership rule, not on who is actually in each group, so two groups that hold the same people under different rules are not reported and two similarly named groups serving different purposes are. Whether a duplicate is deliberate, as a pilot beside its production group, is not visible."
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "HYG-002",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "HYG",
+  "title": "Device cleanup threshold is very long",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Tenant.CleanupRuleKnown && Facts.Tenant.CleanupRuleEnabled",
+  "requires": [
+    "Tenant"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.Tenant.CleanupRuleDays > params.maxDays",
+  "params": {
+    "maxDays": {
+      "default": 90,
+      "range": [
+        30,
+        270
+      ],
+      "text": "Days of silence before a device is removed"
+    }
+  },
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Records persist long after the hardware has gone, so counts stay inflated and stale devices keep appearing in compliance reporting.",
+    "remediation": [
+      "Reduce the cleanup threshold, commonly to between 60 and 90 days."
+    ],
+    "cannotSee": "Where a tenant keeps several cleanup rules this reads the longest of them, because that is the one deciding how long the oldest record survives, so a tenant with one sensible rule and one careless one is reported on the careless one. What period suits an organisation is a judgement this cannot make: an estate of laptops that travel for months is not the estate the default was written for, which is why the threshold is a parameter."
+  },
+  "related": [
+    "HYG-001"
+  ]
+}

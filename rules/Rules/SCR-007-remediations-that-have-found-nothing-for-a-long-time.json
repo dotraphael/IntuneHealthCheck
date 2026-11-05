@@ -1,0 +1,48 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SCR-007",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SCR",
+  "title": "Remediations that have found nothing for a long time",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Remediations"
+  ],
+  "scope": "Facts.Remediations",
+  "where": "it.Assignments.Any() && it.StatusKnown",
+  "when": "it.IssueDetectedCount == 0 && DaysSince(it.CreatedOn) > params.staleDays",
+  "params": {
+    "staleDays": {
+      "default": 180,
+      "range": [
+        30,
+        730
+      ],
+      "text": "Days without a detection before a remediation looks obsolete"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'remediation has', 'remediations have')} found nothing in {params.staleDays} days",
+    "columns": {
+      "Remediation": "it.Name",
+      "Created": "it.CreatedOn:d",
+      "Targeted": "it.TargetedDeviceCount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Either the problem is solved, in which case the remediation is now overhead running on every device, or the detection stopped working and nobody noticed.",
+    "remediation": [
+      "Verify the detection still works on a device where the condition is present, then retire the remediation if it does."
+    ],
+    "cannotSee": "A remediation that has found nothing may be working: the condition it looks for is one the estate no longer has, which is the outcome anybody would want. Age is measured from when the remediation was created rather than from when it was last assigned, so one written long ago and pointed at a new group reads as older than its watch. The counts are the current summary rather than a history, so a remediation that found something last year and nothing since reads as having found nothing."
+  }
+}

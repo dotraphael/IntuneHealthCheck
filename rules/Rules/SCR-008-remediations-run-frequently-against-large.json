@@ -1,0 +1,57 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SCR-008",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SCR",
+  "title": "Remediations run frequently against large populations",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Remediations",
+    "Devices"
+  ],
+  "scope": "Facts.Remediations",
+  "where": "it.Assignments.Any() && it.StatusKnown",
+  "when": "it.ScheduleIntervalHours > 0 && it.ScheduleIntervalHours <= params.maxFrequencyHours && it.TargetedDeviceCount > params.largePopulation",
+  "params": {
+    "largePopulation": {
+      "default": 1000,
+      "range": [
+        10,
+        100000
+      ],
+      "text": "Devices above which frequency has a measurable cost"
+    },
+    "maxFrequencyHours": {
+      "default": 1,
+      "range": [
+        1,
+        24
+      ],
+      "text": "Interval below which frequency starts to matter"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'remediation runs', 'remediations run')} hourly on a large population",
+    "columns": {
+      "Remediation": "it.Name",
+      "Interval (hours)": "it.ScheduleIntervalHours",
+      "Devices": "it.TargetedDeviceCount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Every run costs processor time on every device and generates reporting traffic. At this scale it is a measurable drain for a check that rarely finds anything.",
+    "remediation": [
+      "Reduce the frequency to daily unless the condition genuinely recurs within hours."
+    ],
+    "cannotSee": "What the script costs to run is not measured, only how often it runs and how many devices it runs on. A detection script that reads one registry value hourly costs almost nothing; one that walks a disk costs a great deal, and they read the same here. Where a remediation is assigned to several groups the shortest schedule is taken, because that is the one setting the cost, and a remediation set to run once has no interval and is passed over."
+  }
+}

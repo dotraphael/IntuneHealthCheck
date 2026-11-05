@@ -1,0 +1,50 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-011",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ENR",
+  "title": "Windows Hello PIN minimum length is short",
+  "type": "Misconfiguration",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EnrolmentConfigs"
+  ],
+  "scope": "Facts.EnrolmentConfigs",
+  "where": "it.Type == 'WindowsHello' && it.State == 'Enabled'",
+  "when": "it.PinMinimumLength < params.minLength",
+  "params": {
+    "minLength": {
+      "default": 6,
+      "range": [
+        4,
+        20
+      ],
+      "text": "Minimum PIN length"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "Windows Hello PIN minimum is {Items.Count} characters",
+    "columns": {
+      "Policy": "it.Name",
+      "Minimum length": "it.PinMinimumLength"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A four digit PIN protects a credential that unlocks company data. The device lockout helps, but the margin is thinner than it needs to be.",
+    "remediation": [
+      "Raise the minimum PIN length to six or more."
+    ],
+    "cannotSee": "The minimum length is one property of many. A tenant requiring uppercase, digits or symbols has a stronger credential than the length alone suggests, and this does not weigh that."
+  },
+  "related": [
+    "ENR-010"
+  ]
+}

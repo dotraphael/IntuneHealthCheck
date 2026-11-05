@@ -1,0 +1,44 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SCR-011",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SCR",
+  "title": "Scripts run in 32-bit context on 64-bit devices",
+  "type": "Misconfiguration",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Scripts",
+    "Remediations"
+  ],
+  "scope": "Facts.Derived.AllScripts",
+  "where": "it.Assignments.Any() && !it.IsMicrosoftAuthored",
+  "when": "!it.RunAs64Bit",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'script runs', 'scripts run')} in 32-bit context",
+    "columns": {
+      "Script": "it.Name",
+      "Type": "it.ObjectType",
+      "Run as": "it.RunAsAccount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Registry writes and file paths are redirected, so a script can report success while having changed something other than what was intended.",
+    "remediation": [
+      "Enable Run script in 64-bit PowerShell host unless the script specifically needs the 32-bit view of the registry or the file system.",
+      "Expect this to be off across the estate: Microsoft's own deployment steps for a remediation package set it to No, so change it where the script reads a 64 bit path rather than everywhere at once."
+    ],
+    "cannotSee": "Only the host the script is told to run in is read, not whether it matters. A script that touches nothing outside its own logic runs identically either way, and one reading a 64 bit registry path or a program directory does not. Microsoft's own instructions for creating a remediation package set this to No, so a tenant that followed them is reported here for having done as it was told, which is why this is Low. The script packages Microsoft publishes are passed over, because nobody in the tenant can change the setting on one. Which devices are 64 bit is not checked against the script, so a script left in the 32 bit host on an estate that has none is reported the same as one on an estate that is entirely 64 bit."
+  },
+  "related": [
+    "SCR-002",
+    "SCR-009"
+  ]
+}

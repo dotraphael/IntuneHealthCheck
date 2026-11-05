@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SCR-010",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SCR",
+  "title": "Scripts are assigned to All Devices or All Users",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Scripts",
+    "Remediations"
+  ],
+  "scope": "Facts.Derived.AllScripts",
+  "when": "it.Assignments.Any(a => a.IsAllDevices || a.IsAllUsers)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'script targets', 'scripts target')} the whole estate",
+    "columns": {
+      "Script": "it.Name",
+      "Type": "it.ObjectType",
+      "Assigned to": "it.AssignmentSummary",
+      "Run as": "it.RunAsAccount"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Code runs everywhere with no pilot, so a mistake affects every device before anyone can see it happening.",
+    "remediation": [
+      "Target a pilot group first and widen after the results are checked."
+    ],
+    "cannotSee": "Targeting the whole estate is sometimes right: a script that collects an inventory or sets one harmless value belongs everywhere, and this reports it beside one that does not. Assignment filters narrow what a built-in target reaches and are not read into this judgement, so an assignment carrying one is reported as though it reached everybody. What the script does is not considered at all."
+  },
+  "related": [
+    "SCR-009"
+  ]
+}

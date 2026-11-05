@@ -1,0 +1,37 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-016",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ENR",
+  "title": "All users may register devices with Entra ID",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "EntraDeviceSettings"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.EntraDeviceSettings.RegisterScope == 'All'",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Personal devices can register with the organisation's identity without any management applying, so they appear in the directory without being governed by it.",
+    "technicalDetail": "Registration is not join. Restricting it breaks personal device scenarios and app protection, so the right value depends on whether the organisation intends to support them.",
+    "remediation": [
+      "Under Entra device settings, change Users may register devices to Selected and name the group that needs it, rather than leaving it at All.",
+      "None turns personal device registration off for everyone, which breaks app protection and personal Outlook access, so a subset is the setting to aim at unless the organisation has decided against personal devices entirely.",
+      "Whichever is chosen, control what a registered device may reach through app protection policies and Conditional Access rather than through this setting alone."
+    ],
+    "cannotSee": "Whether personal device use is intended is a policy decision this cannot infer, and an organisation that supports it deliberately will be reported here. Only the scope is read, not how many devices have registered through it, so a setting nobody has used reads the same as one in daily use."
+  },
+  "related": [
+    "ENR-015"
+  ]
+}

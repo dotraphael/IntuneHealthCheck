@@ -1,0 +1,37 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-009",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ENR",
+  "title": "Autopilot registrations that have never been seen",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "AutopilotDevices"
+  ],
+  "scope": "Facts.AutopilotDevices",
+  "when": "it.NeverContacted",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Autopilot {Plural(Items.Count, 'registration has', 'registrations have')} never been used",
+    "columns": {
+      "Serial": "it.SerialNumber",
+      "Model": "it.Model",
+      "Group tag": "it.GroupTag"
+    },
+    "exposure": "1",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "Hardware registered but never provisioned is either sitting in a cupboard or has been disposed of without being deregistered, and either way the record is misleading.",
+    "remediation": [
+      "Confirm whether the hardware still exists, and delete the registrations that do not."
+    ],
+    "cannotSee": "Graph returns no registration date on an Autopilot registration, so how long one has sat unused cannot be judged and every registration that has never reported is listed, including hardware bought last week."
+  }
+}

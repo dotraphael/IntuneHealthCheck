@@ -1,0 +1,49 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "DEV-012",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "DEV",
+  "title": "Device categories are not in use",
+  "type": "MissingCapability",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Devices.Total > 0",
+  "requires": [
+    "Devices",
+    "DeviceCategories"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.DeviceCategories.Any() || Pct(Facts.Devices.Items.Count(d => d.HasCategory), Facts.Devices.Total) < params.minCategorisedPct",
+  "params": {
+    "minCategorisedPct": {
+      "default": 10,
+      "range": [
+        0,
+        100
+      ],
+      "text": "Share of devices in a category below which categories count as unused"
+    }
+  },
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Nothing in the estate records what a machine is for. Reporting cannot be broken down by purpose, dynamic groups have to be built on naming conventions instead, and a laptop, a kiosk and a lab machine are all treated as the same thing.",
+    "remediation": [
+      "Define the handful of categories the estate actually divides into, rather than one per department.",
+      "Build the dynamic groups that policy targets on the category, so the label does something.",
+      "Decide whether users pick the category at enrolment or administrators set it afterwards, because the enrolment prompt reaches user-driven enrolment only."
+    ],
+    "cannotSee": "Intune answers Unknown for a device nobody put in a category, which is read as none. A category is a label rather than a control, so a tenant that divides its estate by naming convention, by group or by scope tag instead is reported as not using categories, which is true of the feature and says nothing about how well the estate is organised. A category removed after enrolment leaves no trace."
+  },
+  "related": [
+    "HYG-009",
+    "TEN-009"
+  ]
+}

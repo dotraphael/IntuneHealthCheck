@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "HYG-005",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "HYG",
+  "title": "Groups targeted by a workload have no members",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Groups"
+  ],
+  "scope": "Facts.Groups",
+  "when": "it.MemberCountKnown && it.MemberCount == 0 && it.IsTargetedByWorkload",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} empty {Plural(Items.Count, 'group is', 'groups are')} targeted by policies or applications",
+    "columns": {
+      "Group": "it.Name",
+      "Type": "it.GroupType",
+      "Used by": "it.WorkloadCount"
+    },
+    "exposure": "1",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "Every policy pointing at these groups appears deployed and reaches nothing, which is the most convincing way for a control to be absent.",
+    "remediation": [
+      "Check whether a dynamic rule has stopped matching, which is the usual cause.",
+      "Populate the group or retarget the assignments."
+    ],
+    "cannotSee": "A group whose membership this run could not read is passed over rather than reported, so the count here is a floor and not a total. Emptiness is counted across every kind of member, not devices alone, because a group of people holds no devices and reading the two as one figure reported every user group in a tenant as empty. What targets the group is counted from the objects this run read, so a group targeted only by something the run could not see reads as targeted by nothing and is not reported at all. Whether a group is empty on purpose, as a ring waiting to be filled, is not visible."
+  },
+  "related": [
+    "CFG-002",
+    "HYG-009"
+  ]
+}

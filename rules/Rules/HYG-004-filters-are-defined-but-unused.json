@@ -1,0 +1,54 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "HYG-004",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "HYG",
+  "title": "Filters are defined but unused",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Filters",
+    "AssignmentListsComplete",
+    "ConfigurationProfiles",
+    "EndpointSecurityPolicies",
+    "CompliancePolicies",
+    "Apps",
+    "Baselines",
+    "Scripts",
+    "Remediations",
+    "UpdateRings",
+    "QualityUpdatePolicies",
+    "DriverUpdatePolicies",
+    "EnrolmentConfigs",
+    "AutopilotProfiles"
+  ],
+  "scope": "Facts.Filters",
+  "when": "!it.IsUsed",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} assignment {Plural(Items.Count, 'filter is', 'filters are')} not used by any assignment",
+    "columns": {
+      "Filter": "it.Name",
+      "Platform": "it.Platform",
+      "Rule": "it.Rule"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Filters written and never applied, which usually means an intended targeting change was started and left unfinished.",
+    "remediation": [
+      "Apply the filters where they were meant to go, or delete them."
+    ],
+    "cannotSee": "The filter list and twelve supported assignable workloads must all be collected; if any required area is unavailable this check skips instead of calling a referenced filter unused. A filter deliberately retained for a future change looks the same as one forgotten."
+  },
+  "related": [
+    "HYG-003",
+    "CFG-014"
+  ]
+}

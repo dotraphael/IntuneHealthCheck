@@ -1,0 +1,71 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "DEV-013",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "DEV",
+  "title": "Devices never checked in after enrolment",
+  "type": "OperationalFailure",
+  "severity": "High",
+  "confidence": "Medium",
+  "effort": "Medium",
+  "requires": [
+    "Devices"
+  ],
+  "scope": "Facts.Devices",
+  "where": "it.IsWindows && it.EnrolledOn != null",
+  "when": "DaysSince(it.EnrolledOn) > params.minAgeDays && (it.LastSync == null || DaysSince(it.LastSync) >= DaysSince(it.EnrolledOn) - params.maxEnrolmentLagDays)",
+  "raiseWhen": "Pct(Items.Count, Scoped.Count) > params.maxStuckPct",
+  "params": {
+    "maxEnrolmentLagDays": {
+      "default": 1,
+      "range": [
+        0,
+        3
+      ],
+      "text": "Days of check-in lag after enrolment that still count as never settled"
+    },
+    "maxStuckPct": {
+      "default": 2,
+      "range": [
+        0,
+        100
+      ],
+      "text": "Share of enrolled Windows devices before this is worth reporting"
+    },
+    "minAgeDays": {
+      "default": 3,
+      "range": [
+        1,
+        30
+      ],
+      "text": "Days after enrolment before a silent device is treated as stuck"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Windows {Plural(Items.Count, 'device enrolled', 'devices enrolled')} and never settled with Intune",
+    "columns": {
+      "Device": "it.Name",
+      "Enrolled": "it.EnrolledOn:d",
+      "Last check-in": "it.LastSync:d",
+      "Primary user": "it.PrimaryUser"
+    },
+    "exposure": "Share(Items.Count, Scoped.Count)",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "These machines enrolled and then never spoke to Intune again, which is what a failed Autopilot or Enrollment Status Page run looks like. They hold an identity and none of the policy the enrolment was meant to deliver.",
+    "remediation": [
+      "Find whether provisioning failed, the device left the network, or the record is stale, then re-provision or clean up."
+    ],
+    "cannotSee": "Intune records enrolment as a check-in, so a device whose last check-in fell within a day of its enrolment has not been heard from since. One that settled and then went quiet later is DEV-001's question instead. A device enrolled in the last few days is left out until it has had time to settle. All times are UTC."
+  },
+  "related": [
+    "DEV-001",
+    "ENR-003",
+    "ENR-005"
+  ]
+}

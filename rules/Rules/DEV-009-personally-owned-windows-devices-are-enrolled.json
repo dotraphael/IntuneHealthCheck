@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "DEV-009",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "DEV",
+  "title": "Personally owned Windows devices are enrolled",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Devices"
+  ],
+  "scope": "Facts.Devices",
+  "where": "it.IsWindows",
+  "when": "it.Ownership == 'personal'",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} personally owned Windows {Plural(Items.Count, 'device is', 'devices are')} enrolled",
+    "columns": {
+      "Device": "it.Name",
+      "Primary user": "it.PrimaryUser",
+      "Enrolled": "it.EnrolledOn:d"
+    },
+    "exposure": "Share(Items.Count, Facts.Devices.WindowsCount)",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "Company policy and data are on hardware the organisation does not own, cannot recover and cannot dispose of securely when the person leaves.",
+    "remediation": [
+      "Decide whether these should be there. Where they should not, block personal Windows enrolment and retire them.",
+      "Where personal access is intended, deliver it through app protection rather than enrolment."
+    ],
+    "cannotSee": "Ownership is what Intune recorded at enrolment, which an administrator can change afterwards and which a corporate device enrolled through a personal route can carry wrongly. Whether personal enrolment is intended is a decision the tenant has made elsewhere, which ENR-002 reads."
+  },
+  "related": [
+    "ENR-001"
+  ]
+}

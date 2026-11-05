@@ -1,0 +1,56 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "DEV-004",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "DEV",
+  "title": "A significant share of devices are non-compliant",
+  "type": "OperationalFailure",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Devices",
+    "CompliancePolicies"
+  ],
+  "scope": "Facts.Devices",
+  "where": "it.IsWindows",
+  "when": "it.ComplianceState == 'noncompliant'",
+  "raiseWhen": "Pct(Items.Count, Scoped.Count) > params.maxNonCompliantPct",
+  "params": {
+    "maxNonCompliantPct": {
+      "default": 10,
+      "range": [
+        0,
+        100
+      ],
+      "text": "Share non-compliant before the position is untenable"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Windows {Plural(Items.Count, 'device is', 'devices are')} non-compliant",
+    "columns": {
+      "Device": "it.Name",
+      "Last check-in": "it.LastSync:d",
+      "OS build": "it.OsVersion",
+      "Owner": "it.Ownership"
+    },
+    "exposure": "Share(Items.Count, Scoped.Count)",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "Either a real security gap exists across a large part of the estate, or the compliance policy is asking for something the estate cannot meet. Both need answering, and the second is more common.",
+    "remediation": [
+      "Group the failures by which compliance setting is failing before doing anything else.",
+      "A single dominant cause usually means a policy problem; a spread of causes means a device problem."
+    ],
+    "cannotSee": "Which compliance setting is failing is per-device state this tool does not read, so the finding says how many devices fail and not why. That grouping is the first thing to do and has to be done in the console."
+  },
+  "related": [
+    "CMP-001",
+    "DEV-005"
+  ]
+}

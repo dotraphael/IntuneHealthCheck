@@ -1,0 +1,59 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "DEV-006",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "DEV",
+  "title": "Devices are running unsupported Windows builds",
+  "type": "OperationalFailure",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Devices",
+    "WindowsBuilds"
+  ],
+  "scope": "Facts.Devices",
+  "where": "it.IsWindows && DaysSince(it.LastSync) <= params.activeDays",
+  "when": "Ref.WindowsBuilds.IsKnown(it.OsVersion) && !Ref.WindowsBuilds.IsSupported(it.OsVersion)",
+  "params": {
+    "activeDays": {
+      "default": 30,
+      "range": [
+        1,
+        180
+      ],
+      "text": "Days within which a device must have checked in to count"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} active {Plural(Items.Count, 'device is', 'devices are')} on an unsupported Windows build",
+    "columns": {
+      "Device": "it.Name",
+      "OS build": "it.OsVersion",
+      "Model": "it.Model",
+      "Last check-in": "it.LastSync:d"
+    },
+    "exposure": "Share(Items.Count, Facts.Devices.WindowsCount)",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "No security updates are being issued for these builds at all, so every vulnerability found from now on remains open on these machines permanently.",
+    "remediation": [
+      "Establish why they have not updated: a deferral, a feature update policy target, or a failing upgrade.",
+      "Where hardware cannot take a supported build, treat it as a replacement list with a date."
+    ],
+    "cannotSee": "A device on a build the Windows build list does not hold is passed over rather than called out of support, so a build newer than the list, or one the vendor has not recorded, costs the check rather than producing a finding nobody can act on."
+  },
+  "frameworks": [
+    "CE:security-update-management"
+  ],
+  "related": [
+    "UPD-011",
+    "UPD-013",
+    "CMP-004"
+  ]
+}

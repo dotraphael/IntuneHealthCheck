@@ -1,0 +1,54 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "HYG-013",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "HYG",
+  "title": "Assignment references a missing filter",
+  "type": "OperationalFailure",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Filters",
+    "AssignmentListsComplete",
+    "ConfigurationProfiles",
+    "EndpointSecurityPolicies",
+    "CompliancePolicies",
+    "Apps",
+    "Baselines",
+    "Scripts",
+    "Remediations",
+    "UpdateRings",
+    "QualityUpdatePolicies",
+    "DriverUpdatePolicies",
+    "EnrolmentConfigs",
+    "AutopilotProfiles"
+  ],
+  "scope": "Facts.Derived.Assignables",
+  "when": "it.Assignments.Any(a => a.FilterId != null && !Facts.Filters.Any(f => f.MatchesId(a.FilterId)))",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'object has', 'objects have')} an assignment naming a missing filter",
+    "columns": {
+      "Object": "it.Name",
+      "Type": "it.ObjectType",
+      "Missing filter ID": "it.Assignments.Where(a => a.FilterId != null && !Facts.Filters.Any(f => f.MatchesId(a.FilterId))).Select(a => a.FilterId)"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The assignment names a filter that the tenant no longer has, so its intended target cannot be verified from the current configuration.",
+    "remediation": [
+      "Remove the stale filter reference and attach an existing filter after checking the intended device target."
+    ],
+    "cannotSee": "The filter list and every supported assignable workload must be collected successfully. If any required area is unavailable, the rule skips rather than treating an unread filter as deleted."
+  },
+  "related": [
+    "HYG-006",
+    "CFG-014"
+  ]
+}

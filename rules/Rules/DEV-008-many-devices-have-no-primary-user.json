@@ -1,0 +1,49 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "DEV-008",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "DEV",
+  "title": "Many devices have no primary user",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Devices"
+  ],
+  "scope": "Facts.Devices",
+  "where": "it.IsWindows",
+  "when": "it.PrimaryUser == null",
+  "raiseWhen": "Pct(Items.Count, Scoped.Count) > params.maxPct",
+  "params": {
+    "maxPct": {
+      "default": 10,
+      "range": [
+        0,
+        100
+      ],
+      "text": "Share without a primary user before support and licensing suffer"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'device has', 'devices have')} no primary user",
+    "columns": {
+      "Device": "it.Name",
+      "Enrolled": "it.EnrolledOn:d",
+      "Ownership": "it.Ownership"
+    },
+    "exposure": "Share(Items.Count, Scoped.Count)",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "Nobody can be contacted about the device, user-targeted policy does not reach it, and self-service actions such as key retrieval do not work.",
+    "remediation": [
+      "Set the primary user on shared or kiosk devices deliberately, or accept them as an exception and exclude them."
+    ],
+    "cannotSee": "A device Intune holds no primary user for is reported, whether that is deliberate or not: a shared, kiosk or lab machine legitimately has none, and this cannot tell one from an oversight."
+  }
+}

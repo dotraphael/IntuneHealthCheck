@@ -1,0 +1,35 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-023",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ENR",
+  "title": "No terms and conditions are published for enrolment",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Tenant"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.Tenant.TermsKnown && !Facts.Tenant.TermsConfigured",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Nobody enrolling a device is told what management does and does not give the organisation sight of, so the organisation has no record that anyone accepted it and users assume the worst.",
+    "remediation": [
+      "Publish terms under Tenant administration, Terms and conditions, saying plainly what the organisation can see, what it cannot, and what it may do to a device.",
+      "Assign them to the groups that enrol, since terms nobody is assigned are never shown."
+    ],
+    "cannotSee": "Only whether terms exist is read, not what they say, whether they are assigned to anyone, or whether anyone has accepted them. Terms written into an intranet page or an employment contract instead are invisible here and may be the whole answer for an organisation that has done it that way."
+  },
+  "related": [
+    "ENR-013"
+  ]
+}

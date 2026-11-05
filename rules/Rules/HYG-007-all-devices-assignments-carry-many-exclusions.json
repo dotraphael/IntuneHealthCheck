@@ -1,0 +1,49 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "HYG-007",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "HYG",
+  "title": "All Devices assignments carry many exclusions",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles",
+    "Apps"
+  ],
+  "scope": "Facts.Derived.Assignables",
+  "when": "it.Assignments.Any(a => a.IsAllDevices) && it.ExclusionCount > params.maxExclusions",
+  "params": {
+    "maxExclusions": {
+      "default": 3,
+      "range": [
+        1,
+        50
+      ],
+      "text": "Exclusions above which the intent is no longer visible"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} broad {Plural(Items.Count, 'assignment has', 'assignments have')} more than {params.maxExclusions} exclusions",
+    "columns": {
+      "Object": "it.Name",
+      "Type": "it.ObjectType",
+      "Exclusions": "it.ExclusionCount",
+      "Excluded groups": "it.ExcludedGroupNames"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Nobody can tell what the assignment actually covers without working through the exclusion list, so mistakes are found by their effects rather than by review.",
+    "remediation": [
+      "Replace the broad assignment plus exclusions with an inclusion group, or with a filter that expresses the intent directly."
+    ],
+    "cannotSee": "An exclusion is counted, not judged: a broad assignment carved back to the right population with exclusions is a legitimate way to work and reads here the same as one nobody has maintained. The count is of assignments rather than of people, so one exclusion of a large group counts once and twenty exclusions of empty ones count twenty. Nothing is read about whether the excluded groups still exist or still hold anyone, which is HYG-006's question."
+  }
+}

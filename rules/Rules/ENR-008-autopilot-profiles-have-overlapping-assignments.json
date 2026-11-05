@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-008",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ENR",
+  "title": "Autopilot profiles have overlapping assignments",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "AutopilotProfiles",
+    "Groups"
+  ],
+  "scope": "Facts.AutopilotProfiles",
+  "where": "it.Assignments.Any()",
+  "when": "Facts.Derived.GroupUsage.HasOverlap(it, 'AutopilotProfile')",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Autopilot {Plural(Items.Count, 'profile overlaps', 'profiles overlap')} another",
+    "columns": {
+      "Profile": "it.Name",
+      "Assigned to": "it.AssignedGroupNames"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A device matching two profiles gets whichever Intune chooses, so provisioning is not reproducible and a device built today may differ from one built tomorrow.",
+    "remediation": [
+      "Separate the target groups so each device matches exactly one profile.",
+      "Use exclusions where a broad group is deliberate."
+    ],
+    "cannotSee": "Overlap is worked out from the groups each profile targets and the device membership this run could read, so a profile assigned to a group whose members could not be read is not judged, and one targeting all devices overlaps everything. Which profile Intune would actually apply is decided by rules this tool does not model."
+  }
+}

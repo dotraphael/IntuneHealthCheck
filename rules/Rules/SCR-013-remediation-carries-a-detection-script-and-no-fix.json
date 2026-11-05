@@ -1,0 +1,44 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SCR-013",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SCR",
+  "title": "Remediation carries a detection script and no fix",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Medium",
+  "requires": [
+    "Remediations"
+  ],
+  "scope": "Facts.Remediations",
+  "where": "it.ContentKnown && it.Assignments.Any() && !it.IsMicrosoftAuthored",
+  "when": "!it.HasRemediationScript",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'remediation detects a problem', 'remediations detect problems')} without fixing anything",
+    "columns": {
+      "Remediation": "it.Name",
+      "Detected": "it.IssueDetectedCount",
+      "Devices": "it.TargetedDeviceCount",
+      "Assigned to": "it.AssignmentSummary"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The condition is measured on every device and nothing is done about it. Whoever built the check believed it would act, and the only way anybody learns otherwise is by reading the report, which nobody does until something has already gone wrong.",
+    "remediation": [
+      "Add the repair script to the package, so the problem is fixed where it is found.",
+      "Where the check is meant to report rather than fix, say so in the description, and give someone the job of reading it."
+    ],
+    "cannotSee": "Intune allows a package to carry a detection script alone, and this reports that it does, not that it is wrong to. A check written to measure how widespread something is, before anybody decides what to do about it, is a legitimate use and reads here exactly like a package somebody never finished. Whether a person reads the results is not visible. The script packages Microsoft publishes are passed over, because their content is not the tenant's to change. A package whose content this run could not read is passed over rather than reported, because a script nobody saw is not a script that is missing."
+  },
+  "related": [
+    "SCR-006",
+    "SCR-007"
+  ]
+}

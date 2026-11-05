@@ -1,0 +1,50 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "DEV-011",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 3,
+  "domain": "DEV",
+  "title": "Many devices were enrolled outside Autopilot",
+  "type": "BestPractice",
+  "severity": "Info",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Devices",
+    "AutopilotDevices"
+  ],
+  "scope": "Facts.Devices",
+  "where": "it.IsWindows",
+  "when": "!it.IsAutopilotRegistered",
+  "raiseWhen": "Pct(Items.Count, Scoped.Count) > params.maxPct",
+  "params": {
+    "maxPct": {
+      "default": 20,
+      "range": [
+        0,
+        100
+      ],
+      "text": "Share enrolled outside Autopilot before provisioning consistency suffers"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Windows {Plural(Items.Count, 'device was', 'devices were')} not provisioned through Autopilot",
+    "columns": {
+      "Device": "it.Name",
+      "Enrolled": "it.EnrolledOn:d",
+      "Model": "it.Model"
+    },
+    "exposure": "Share(Items.Count, Scoped.Count)",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "Devices built by hand differ from each other in ways nobody records, which is where most unexplained support cases begin.",
+    "remediation": [
+      "Register new hardware with Autopilot at the point of purchase, through the supplier where possible."
+    ],
+    "cannotSee": "An Autopilot registration and an enrolment are matched by identifier, so hardware registered after it enrolled counts against the tenant here, and a device provisioned through Autopilot whose registration has since been deleted does too."
+  }
+}

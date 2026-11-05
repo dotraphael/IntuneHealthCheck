@@ -1,0 +1,43 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "HYG-008",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "HYG",
+  "title": "The same workload targets both user and device groups",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles",
+    "Apps",
+    "Groups"
+  ],
+  "scope": "Facts.Derived.Assignables",
+  "where": "it.Assignments.Any()",
+  "when": "it.HasMixedTargeting",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'object mixes', 'objects mix')} user and device targeting",
+    "columns": {
+      "Object": "it.Name",
+      "Type": "it.ObjectType",
+      "Assigned to": "it.AssignmentSummary"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Behaviour varies by whether a person or a machine matched first, which makes support cases hard to reproduce and harder to explain.",
+    "remediation": [
+      "Choose one targeting model per object and apply it consistently."
+    ],
+    "cannotSee": "What a group holds is worked out from its members rather than from anything Entra declares, because Entra has no such property: a group is whatever has ended up in it. A group whose membership this run could not read settles nothing and is passed over, so an object is never reported on the strength of a group nobody could see, and an empty group is passed over too. Anything that is neither a device nor a nested group counts towards people, so a group of service principals reads as a user group. Mixing may also be deliberate, since an application offered to users and required on kiosks is one object doing two jobs."
+  },
+  "related": [
+    "CFG-009"
+  ]
+}

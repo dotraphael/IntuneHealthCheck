@@ -1,0 +1,37 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "HYG-001",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "HYG",
+  "title": "Device cleanup rule is disabled",
+  "type": "MissingCapability",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Tenant"
+  ],
+  "scope": "Tenant",
+  "when": "Facts.Tenant.CleanupRuleKnown && !Facts.Tenant.CleanupRuleEnabled",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Devices that have gone forever stay in the console forever, distorting every count and every report that leadership is shown.",
+    "remediation": [
+      "Enable the device cleanup rule under Devices, Device cleanup rules.",
+      "Set a threshold that matches how the organisation works, allowing for long leave and seasonal staff."
+    ],
+    "cannotSee": "Only whether a cleanup rule exists is read, not whether it has ever run or what it retired. Intune keeps one rule per platform and this asks whether any of them retires an inactive device, so a tenant that cleans up its Windows estate and nothing else is not reported here. An organisation deleting stale records by hand or through its own automation is doing the same work by another route, which this cannot see either."
+  },
+  "related": [
+    "DEV-001",
+    "DEV-002",
+    "HYG-002"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "HYG-012",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 3,
+  "domain": "HYG",
+  "title": "Naming conventions are not followed",
+  "type": "Hygiene",
+  "severity": "Info",
+  "confidence": "Low",
+  "effort": "Small",
+  "requires": [
+    "ConfigurationProfiles",
+    "Apps",
+    "Scripts"
+  ],
+  "scope": "Facts.Derived.Assignables",
+  "when": "!Ref.Naming.Follows(it.Name, it.ObjectType)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'object does', 'objects do')} not follow the naming convention",
+    "columns": {
+      "Object": "it.Name",
+      "Type": "it.ObjectType"
+    },
+    "exposure": "1",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "Inconsistent names make the console hard to navigate and make it hard to tell at a glance what an object is for or who owns it.",
+    "remediation": [
+      "Rename the objects listed to follow the agreed convention, starting with the ones assigned most widely, and hold new objects to it.",
+      "Where the convention itself has changed, change the pattern for that kind of object in the naming convention file, naming.json in the overrides folder under the tool's ProgramData folder, or the file named for this tenant beside it, such as contoso.com.naming.json, so the next run judges against the convention in use."
+    ],
+    "cannotSee": "Names are judged only for the kinds of object the customer's naming convention file gives a pattern for, so without that file this reports nothing at all, and a kind the file leaves out is never judged. That is deliberate: how an organisation names things is its own decision rather than Microsoft's or the vendor's, and guessing a convention from the names a tenant already uses would call the majority correct whatever they are. The file is read on the computer that runs the tool, so a run from another computer judges against whatever that one holds. A name that follows the pattern may still be meaningless, which no pattern can catch."
+  }
+}

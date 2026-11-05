@@ -1,0 +1,33 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "SCR-012",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "SCR",
+  "title": "Remediations are licensed but unused",
+  "type": "BestPractice",
+  "severity": "Info",
+  "confidence": "High",
+  "effort": "Small",
+  "applies": "Facts.Tenant.HasRemediationsEntitlement",
+  "requires": [
+    "Remediations",
+    "Tenant"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.Remediations.Any(r => r.Assignments.Any())",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A capability already paid for is unused. Remediations are the mechanism that fixes drift without a person, which is most of what a health check finds.",
+    "remediation": [
+      "Start with a small number of detections for conditions this report has raised, and let them fix themselves."
+    ],
+    "cannotSee": "The entitlement is inferred from the licences the tenant subscribes to rather than from anything Intune reports, so a licence held but assigned to nobody still counts as entitled. Whether an organisation needs remediations is a judgement this cannot make: one that solves the same problems through configuration or through its own tooling is not failing to use something. A remediation that exists but is assigned to nobody counts as unused, which is what SCR-001 says of a platform script."
+  }
+}

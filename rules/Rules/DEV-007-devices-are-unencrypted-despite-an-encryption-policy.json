@@ -1,0 +1,45 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "DEV-007",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "DEV",
+  "title": "Devices are unencrypted despite an encryption policy",
+  "type": "OperationalFailure",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Devices",
+    "EndpointSecurityPolicies"
+  ],
+  "scope": "Facts.Devices",
+  "where": "it.IsWindows && it.EncryptionKnown && it.IsTargetedByEncryptionPolicy",
+  "when": "!it.IsEncrypted",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'device is', 'devices are')} not encrypted despite being targeted",
+    "columns": {
+      "Device": "it.Name",
+      "Last check-in": "it.LastSync:d",
+      "Model": "it.Model"
+    },
+    "exposure": "Share(Items.Count, Facts.Devices.WindowsCount)",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "The policy is deployed and the device is not encrypted, so the protection everyone believes is in place is absent on these machines specifically.",
+    "remediation": [
+      "Check for a missing or disabled Trusted Platform Module, which is the usual cause.",
+      "Check whether silent encryption is enabled, since a user prompt left unanswered has the same effect."
+    ],
+    "cannotSee": "Which devices an encryption policy reaches is worked out from its assignments and the group membership this run read, so a policy assigned to a group whose members could not be read reaches nobody as far as this rule is concerned, and its devices are not judged. A policy assigned to all devices or all users is taken to reach every device. Why a targeted device is unencrypted, whether the policy failed, the hardware cannot comply, or encryption is simply still running, is not visible here; SEC-001 and CFG-004 ask the two questions either side of it."
+  },
+  "related": [
+    "SEC-001",
+    "SEC-003",
+    "CMP-003"
+  ]
+}

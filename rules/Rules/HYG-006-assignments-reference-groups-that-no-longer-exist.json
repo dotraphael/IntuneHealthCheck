@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "HYG-006",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "HYG",
+  "title": "Assignments reference groups that no longer exist",
+  "type": "OperationalFailure",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Groups",
+    "ConfigurationProfiles",
+    "Apps"
+  ],
+  "scope": "Facts.Derived.GroupUsage.BrokenAssignments",
+  "when": "it.GroupMissing",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'assignment references', 'assignments reference')} a deleted group",
+    "columns": {
+      "Object": "it.ObjectName",
+      "Type": "it.ObjectType",
+      "Group": "it.GroupId"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "The assignment is broken and the policy reaches nobody through it. Nothing in the console flags this, so the object simply appears to be deployed.",
+    "remediation": [
+      "Remove the broken assignments and retarget to a group that exists."
+    ],
+    "cannotSee": "An assignment naming a group this run could not read is not reported, because a group nobody could read is not a group that has been deleted. The two built-in targets name no group and cannot be broken, so they are passed over."
+  },
+  "related": [
+    "HYG-005"
+  ]
+}

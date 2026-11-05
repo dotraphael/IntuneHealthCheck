@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-007",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ENR",
+  "title": "Registered Autopilot devices have no profile assigned",
+  "type": "OperationalFailure",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "AutopilotDevices"
+  ],
+  "scope": "Facts.AutopilotDevices",
+  "when": "it.HasNoProfile",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Autopilot {Plural(Items.Count, 'device has', 'devices have')} no profile",
+    "columns": {
+      "Serial": "it.SerialNumber",
+      "Model": "it.Model",
+      "Group tag": "it.GroupTag",
+      "Enrolment state": "it.EnrolmentState"
+    },
+    "exposure": "Share(Items.Count, Facts.AutopilotDevices.Count())",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "These machines will provision as ordinary devices with no branding, no configuration and no enrolment status page. The user gets a consumer out of box experience on a company laptop.",
+    "remediation": [
+      "Add the devices to the group the Autopilot profile targets, or widen the assignment.",
+      "If the group is dynamic, check its rule matches how these devices were registered."
+    ],
+    "cannotSee": "Intune reports whether a profile is assigned but does not return the profile's name with the registration, so the table says which hardware has none rather than which profile the rest got."
+  },
+  "related": [
+    "ENR-006"
+  ]
+}

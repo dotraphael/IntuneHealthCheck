@@ -1,0 +1,51 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-012",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ENR",
+  "title": "Intune enrolment device limit is at its maximum",
+  "type": "BestPractice",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EnrolmentConfigs"
+  ],
+  "scope": "Facts.EnrolmentConfigs",
+  "where": "it.Type == 'LimitRestriction'",
+  "when": "it.DeviceLimit >= params.maxLimit",
+  "params": {
+    "maxLimit": {
+      "default": 15,
+      "range": [
+        1,
+        15
+      ],
+      "text": "Limit at or above which no practical restriction remains"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} device limit {Plural(Items.Count, 'restriction is', 'restrictions are')} effectively unlimited",
+    "columns": {
+      "Restriction": "it.Name",
+      "Limit": "it.DeviceLimit",
+      "Assigned to": "it.AssignedGroupNames"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "One account can enrol {params.maxLimit} devices, which is as many as Intune allows, so a compromised account can register machines the organisation has no record of buying.",
+    "remediation": [
+      "Reduce the limit to the number a user realistically needs, commonly two or three. Intune will not accept a value above {params.maxLimit}, so a restriction set there is not a restriction."
+    ],
+    "cannotSee": "This is the Intune enrolment restriction, which caps how many devices one account may enrol into Intune. It is a different limit from the directory's own join quota, which ENR-021 reads, and a tenant can have one set sensibly and the other not. Whether fifteen is wrong for this organisation is a judgement: a shared or lab account may need it."
+  },
+  "related": [
+    "ENR-021"
+  ]
+}

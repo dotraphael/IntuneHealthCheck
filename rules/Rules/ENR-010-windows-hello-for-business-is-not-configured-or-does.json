@@ -1,0 +1,38 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-010",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ENR",
+  "title": "Windows Hello for Business is not configured or does not require a TPM",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EnrolmentConfigs"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.EnrolmentConfigs.Any(c => c.Type == 'WindowsHello' && c.State == 'Enabled') || Facts.EnrolmentConfigs.Any(c => c.Type == 'WindowsHello' && c.State == 'Enabled' && !c.RequireTpm)",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Sign-in stays dependent on passwords, which are phishable and reusable, or the credential is protected only by software so it can be copied off the device.",
+    "remediation": [
+      "Enable Windows Hello for Business in the enrolment settings.",
+      "Require a Trusted Platform Module so the credential is bound to the hardware."
+    ],
+    "cannotSee": "Whether Windows Hello suits an organisation is a decision rather than a fault: a tenant using another factor deliberately will be reported here. Only the tenant-wide policy is read, so a Windows Hello setting delivered through a configuration profile instead is invisible to this rule."
+  },
+  "frameworks": [
+    "CE:user-access-control"
+  ],
+  "related": [
+    "ENR-011"
+  ]
+}

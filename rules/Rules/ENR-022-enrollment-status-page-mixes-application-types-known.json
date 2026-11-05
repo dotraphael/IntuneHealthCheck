@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-022",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ENR",
+  "title": "Enrollment Status Page mixes application types known to fail together",
+  "type": "BestPractice",
+  "severity": "Medium",
+  "confidence": "Medium",
+  "effort": "Small",
+  "requires": [
+    "EnrolmentConfigs",
+    "Apps"
+  ],
+  "scope": "Facts.EnrolmentConfigs",
+  "where": "it.Type == 'EnrollmentStatusPage' && it.BlockUntilComplete && it.BlockingAppsMode == 'Selected'",
+  "when": "Ref.EspAppCombinations.HasRiskyMix(it.BlockingAppTypes)",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Enrollment Status Page {Plural(Items.Count, 'profile blocks', 'profiles block')} on a risky mix of application types",
+    "columns": {
+      "Profile": "it.Name",
+      "Types": "Ref.EspAppCombinations.Describe(it.BlockingAppTypes)"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Certain combinations of application type are known to stall provisioning, which presents as a device stuck at the status page with no clear cause.",
+    "remediation": [
+      "Reduce the blocking set to one application type where possible.",
+      "Move the remaining applications out of the blocking list and install them after sign-in."
+    ],
+    "cannotSee": "The combinations flagged come from the pack's reference data and reflect current guidance, which changes."
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-004",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 2,
+  "domain": "ENR",
+  "title": "Enrollment Status Page blocks on all applications rather than a selected set",
+  "type": "Misconfiguration",
+  "severity": "Medium",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EnrolmentConfigs"
+  ],
+  "scope": "Facts.EnrolmentConfigs",
+  "where": "it.Type == 'EnrollmentStatusPage'",
+  "when": "it.BlockUntilComplete && it.BlockingAppsMode == 'All'",
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} Enrollment Status Page {Plural(Items.Count, 'profile blocks', 'profiles block')} on every assigned application",
+    "columns": {
+      "Profile": "it.Name",
+      "Timeout": "it.TimeoutMinutes",
+      "Assigned to": "it.AssignedGroupNames"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Provisioning takes as long as the slowest application in the whole catalogue, and one broken package stops every new device.",
+    "remediation": [
+      "Select only the applications a device genuinely needs before first use.",
+      "Deliver the rest after sign-in."
+    ],
+    "cannotSee": "Which applications the page waits for is read as identifiers and matched to the applications this run collected, so a page naming an application the run could not read counts as naming fewer than it does. Whether waiting for every required application is wrong depends on how many there are and how large they are, which this cannot weigh."
+  },
+  "related": [
+    "ENR-003"
+  ]
+}

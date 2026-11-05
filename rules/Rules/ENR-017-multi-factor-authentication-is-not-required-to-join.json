@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-017",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ENR",
+  "title": "Multi-factor authentication is not required to join or register a device",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EntraDeviceSettings",
+    "CaPolicies"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.EntraDeviceSettings.RequireMfaToJoin && !Facts.CaPolicies.Any(c => c.State == 'enabled' && c.UserAction == 'RegisterOrJoinDevices' && c.Grant.RequireMfa)",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "A stolen password alone is enough to bring a device under the organisation's identity, and that device can then be granted the trust that comes with being enrolled.",
+    "remediation": [
+      "Create a Conditional Access policy targeting the Register or join devices user action with a multi-factor grant, which is the current approach.",
+      "Plan for the prompt during provisioning: users need a registered method or a Temporary Access Pass before the device reaches them."
+    ],
+    "cannotSee": "A Conditional Access policy over the register-or-join user action counts as requiring multi-factor authentication, but only where the policy is enabled and requires it outright. A policy in report-only mode, or one requiring it through a risk condition, is not counted and the tenant is reported as not requiring it."
+  },
+  "frameworks": [
+    "CE:user-access-control"
+  ],
+  "related": [
+    "ENR-015"
+  ]
+}

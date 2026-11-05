@@ -1,0 +1,46 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ENR-024",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ENR",
+  "title": "Self-deploying Autopilot without a progress-tracking Enrollment Status Page",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "Medium",
+  "effort": "Medium",
+  "applies": "Facts.AutopilotProfiles.Any(p => p.IsSelfDeploying && p.Assignments.Any())",
+  "requires": [
+    "AutopilotProfiles",
+    "EnrolmentConfigs"
+  ],
+  "scope": "Tenant",
+  "when": "!Facts.EnrolmentConfigs.Any(e => e.Type == 'EnrollmentStatusPage' && e.ShowProgress && e.Assignments.Any())",
+  "report": {
+    "mode": "single",
+    "exposure": "1",
+    "maxRows": 25,
+    "table": {
+      "source": "Facts.AutopilotProfiles.Where(p => p.IsSelfDeploying && p.Assignments.Any())",
+      "columns": {
+        "Profile": "it.Name",
+        "Join type": "it.JoinType",
+        "Assigned to": "it.AssignmentSummary"
+      }
+    }
+  },
+  "messages": {
+    "businessImpact": "Self-deploying Autopilot finishes to a desktop with no held Enrollment Status Page, so a device can look ready while required apps and policies never arrived.",
+    "remediation": [
+      "Assign an Enrollment Status Page that shows progress and waits for the day-one apps, and target the same self-deploying population."
+    ],
+    "cannotSee": "Does not prove the ESP and the Autopilot profile reach the same devices; it only asks whether any progress-tracking ESP is assigned at all. White glove and pre-provisioning flags beyond IsSelfDeploying are not on the fact model. The console blocking toggle remains unread; see ENR-003 cannotSee."
+  },
+  "related": [
+    "ENR-003",
+    "ENR-004",
+    "ENR-005"
+  ]
+}

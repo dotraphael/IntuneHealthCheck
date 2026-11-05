@@ -1,0 +1,53 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "DEV-002",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "DEV",
+  "title": "Devices silent for a long period are still present",
+  "type": "Hygiene",
+  "severity": "Low",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "Devices"
+  ],
+  "scope": "Facts.Devices",
+  "where": "it.IsWindows",
+  "when": "DaysSince(it.LastSync) > params.longStaleDays",
+  "raiseWhen": "Items.Any()",
+  "params": {
+    "longStaleDays": {
+      "default": 90,
+      "range": [
+        30,
+        730
+      ],
+      "text": "Days after which a device is almost certainly gone"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} {Plural(Items.Count, 'device has', 'devices have')} been silent for more than {params.longStaleDays} days",
+    "columns": {
+      "Device": "it.Name",
+      "Last check-in": "it.LastSync:d",
+      "Enrolled": "it.EnrolledOn:d"
+    },
+    "exposure": "Share(Items.Count, Facts.Devices.WindowsCount)",
+    "maxRows": 50
+  },
+  "messages": {
+    "businessImpact": "These records distort every count in every report, including the ones used to judge compliance and licensing.",
+    "remediation": [
+      "Retire the devices, or enable a cleanup rule with a threshold that matches how the organisation actually works."
+    ],
+    "cannotSee": "Whether a silent device has been decommissioned or is simply switched off is not visible. Intune's own cleanup rule may already be set to remove them, which HYG-001 asks about, so a finding here can be one the tenant has already answered."
+  },
+  "related": [
+    "DEV-001",
+    "HYG-001"
+  ]
+}

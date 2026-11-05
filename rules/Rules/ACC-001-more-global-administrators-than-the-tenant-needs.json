@@ -1,0 +1,62 @@
+{
+  "$schema": "../schema/rule.schema.json",
+  "id": "ACC-001",
+  "version": 1,
+  "minTool": "1.0.0",
+  "status": "active",
+  "tier": 1,
+  "domain": "ACC",
+  "title": "More Global Administrators than the tenant needs",
+  "type": "Misconfiguration",
+  "severity": "High",
+  "confidence": "High",
+  "effort": "Small",
+  "requires": [
+    "EntraRoleAssignments"
+  ],
+  "scope": "Facts.EntraRoleAssignments",
+  "when": "it.RoleName == 'Global Administrator' && !AnyMatch(params.excludeAccounts, it.PrincipalName)",
+  "raiseWhen": "Items.Count() > params.maxGlobalAdmins",
+  "params": {
+    "excludeAccounts": {
+      "default": [],
+      "text": "Emergency access accounts to leave out of the count, by name or with * and ? wildcards"
+    },
+    "maxGlobalAdmins": {
+      "default": 3,
+      "range": [
+        1,
+        20
+      ],
+      "text": "Global Administrators above which the risk outweighs the convenience"
+    }
+  },
+  "report": {
+    "mode": "aggregate",
+    "title": "{Items.Count} accounts hold Global Administrator",
+    "columns": {
+      "Account": "it.PrincipalName",
+      "Assignment": "it.AssignmentType",
+      "Enabled": "it.AccountEnabled"
+    },
+    "exposure": "1",
+    "maxRows": 25
+  },
+  "messages": {
+    "businessImpact": "Global Administrator can do anything in the tenant, including removing the evidence. Every additional holder is another account whose compromise ends the argument.",
+    "technicalDetail": "Microsoft's guidance is to keep the number small, using role-specific administrators for day to day work.",
+    "remediation": [
+      "Move day to day work to Intune Administrator, Security Administrator or a custom role.",
+      "Keep emergency access accounts, and list them in the exclusions so they stop appearing here.",
+      "Make the remaining assignments eligible rather than permanent where Privileged Identity Management is licensed."
+    ],
+    "cannotSee": "Which accounts are emergency access accounts. They are named in the excludeAccounts override for this tenant, so a tenant that has not set one has its break-glass accounts counted here."
+  },
+  "frameworks": [
+    "CE:user-access-control"
+  ],
+  "related": [
+    "ACC-002",
+    "ACC-004"
+  ]
+}

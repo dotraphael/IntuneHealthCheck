@@ -1,0 +1,6 @@
+[
+  { "operation": "Apps", "highImpact": true },
+  { "operation": "Scripts", "highImpact": true },
+  { "operation": "DeviceActions", "highImpact": true },
+  { "operation": "RoleAssignments", "highImpact": true }
+]

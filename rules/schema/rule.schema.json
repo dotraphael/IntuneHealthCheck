@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rflsystems.example/schemas/rule.schema.json",
+  "title": "HealthCheck rule",
+  "type": "object",
+  "required": ["id", "version", "minTool", "status", "tier", "domain", "title", "type", "severity", "confidence", "effort", "requires", "report", "messages"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string", "description": "Pointer to this schema, so an editor checks the rule as it is written." },
+    "id": { "type": "string", "pattern": "^(TEN|ACC|ENR|CFG|CMP|CAD|UPD|SEC|DEV|APP|SCR|HYG)-[0-9]{3}$" },
+    "version": { "type": "integer", "minimum": 1 },
+    "minTool": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "maxTool": { "type": ["string", "null"], "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "status": { "enum": ["active", "disabled", "deprecated"] },
+    "tier": { "type": "integer", "minimum": 1, "maximum": 3 },
+    "domain": { "enum": ["TEN", "ACC", "ENR", "CFG", "CMP", "CAD", "UPD", "SEC", "DEV", "APP", "SCR", "HYG"] },
+    "title": { "type": "string", "minLength": 10, "maxLength": 120 },
+    "type": { "enum": ["Misconfiguration", "MissingCapability", "OperationalFailure", "Hygiene", "BestPractice", "Manual"] },
+    "severity": { "enum": ["Critical", "High", "Medium", "Low", "Info"] },
+    "confidence": { "enum": ["High", "Medium", "Low"] },
+    "effort": { "enum": ["Small", "Medium", "Large"] },
+    "applies": { "type": "string" },
+    "requires": { "type": "array", "items": { "type": "string" }, "minItems": 0 },
+    "scope": { "type": "string" },
+    "where": { "type": "string" },
+    "when": { "type": "string" },
+    "raiseWhen": { "type": "string" },
+    "params": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["default"],
+        "additionalProperties": false,
+        "properties": {
+          "default": {},
+          "range": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+          "text": { "type": "string" }
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "required": ["mode"],
+      "additionalProperties": false,
+      "properties": {
+        "mode": { "enum": ["single", "aggregate", "perObject"] },
+        "title": { "type": "string" },
+        "columns": { "type": "object", "additionalProperties": { "type": "string" } },
+        "exposure": { "type": "string", "description": "Expression for the share of the estate affected, 0 to 1. Without one, exposure is 0 and the finding scores at the pack's exposure floor." },
+        "maxRows": { "type": "integer", "minimum": 1, "maximum": 500 },
+        "table": {
+          "type": "object",
+          "required": ["source", "columns"],
+          "additionalProperties": false,
+          "properties": {
+            "source": { "type": "string" },
+            "columns": { "type": "object", "additionalProperties": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "messages": {
+      "type": "object",
+      "required": ["businessImpact", "remediation"],
+      "additionalProperties": false,
+      "properties": {
+        "businessImpact": { "type": "string", "minLength": 20 },
+        "technicalDetail": { "type": "string" },
+        "remediation": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "cannotSee": { "type": "string" }
+      }
+    },
+    "frameworks": { "type": "array", "items": { "type": "string" } },
+    "related": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z]{3}-[0-9]{3}$" } },
+    "learnMore": { "type": "string", "format": "uri" },
+    "tests": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["tenant", "expect"],
+        "additionalProperties": false,
+        "properties": {
+          "tenant": { "type": "string" },
+          "expect": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "items": { "type": "integer", "minimum": 0 },
+              "raised": { "type": "boolean" },
+              "notApplicable": { "type": "boolean" },
+              "exposureAtLeast": { "type": "number" },
+              "exposureAtMost": { "type": "number" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "type": { "const": "Manual" } }, "required": ["type"] },
+      "then": { "not": { "required": ["when"] } },
+      "else": { "required": ["when"] }
+    }
+  ]
+}
